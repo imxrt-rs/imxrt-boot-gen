@@ -1,12 +1,12 @@
 [package]
-name = "imxrt1062-fcb-gen"
+name = "imxrt-fcb-gen"
 version = "0.1.0"
 authors = ["Ian McIntyre <ianpmcintyre@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mciantyre/teensy4-rs"
 description = """
-Generate Firmware Configuration Block (FCB) for iMXRT1062 processors in Rust build scripts.
+Generate Firmware Configuration Block (FCB) for iMXRT processors in Rust build scripts.
 Part of the teensy4-rs project.
 """
 categories = [
@@ -17,7 +17,7 @@ categories = [
 keywords = [
     "arm",
     "cortex-m",
-    "imxrt1062",
+    "imxrt",
 ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

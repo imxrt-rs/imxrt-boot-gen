@@ -10,23 +10,23 @@
 //! interact with NAND- / NOR-based FLASH memory. The FCB has a lot of magic
 //! numbers, and it would be nice to have an API to generate the FCB.
 //!
-//! The `imxrt1062-fcb-gen` crate provides an API for generating the FCB. As of this
+//! The `imxrt-fcb-gen` crate provides an API for generating the FCB. As of this
 //! writing, it supports only the generation of an FCB for reading NOR Flash via
 //! FlexSPI. Other configurations, such as NAND Flash and / or the SEMC interface,
 //! may be added later.
 //!
 //! # Usage
 //!
-//! Add `imxrt1062-fcb-gen` to your build dependencies:
+//! Add `imxrt-fcb-gen` to your build dependencies:
 //!
 //! ```toml
 //! [build-dependencies]
-//! imxrt1062-fcb-gen = { path = "../imxrt1062-fcb-gen" }
+//! imxrt-fcb-gen = { path = "../imxrt-fcb-gen" }
 //! ```
 //!
 //! Then, instantiate a `Builder` in your `build.rs` build script. Unless a
 //! member of the `Builder` implements `Default`, it's probably required and
-//! it requires your input. See the `iMXRT1062` reference manual for details
+//! it requires your input. See the `iMXRT` reference manual for details
 //! that may be missing from this library.
 //!
 //! Once the builder is built, write the FCB instance from your build script, and
@@ -43,7 +43,7 @@
 //! The example below demonstrates how we might define the FCB for a Teensy 4.
 //!
 //! ```rust
-//! use imxrt1062_fcb_gen::*;
+//! use imxrt_fcb_gen::*;
 //!
 //! // We're using serial NOR flash.
 //! let nor_cb = nor::ConfigurationBlock {
