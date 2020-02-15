@@ -61,6 +61,11 @@ impl Builder {
             fcb.field_comment(0x018, &arg, "deviceModeArg");
         }
 
+        // TODO configCmdEnable
+        // TODO configCmdSeqs
+        // TODO cfgCmdArgs
+        // TODO controllerMiscOption
+
         fcb.field_comment(
             0x044,
             match self.device_type {
@@ -78,6 +83,9 @@ impl Builder {
             &(self.serial_clk_freq as u8).to_le_bytes(),
             "serialClkFreq",
         );
+
+        // TODO lutCustomSeqEnable
+
         // TODO after adding SerialNAND, we have to multiply all
         // the flash sizes by 2
         fcb.field_comment(
@@ -100,10 +108,21 @@ impl Builder {
             &self.flash_b2_size.size.to_le_bytes(),
             "sflashB2Size",
         );
-        let lookup_table_offset = 0x080;
+
+        // TODO csPadSettingOverride
+        // TODO sclkPadSettingOverride
+        // TODO dataPadSettingOverride
+        // TODO dqsPadSettingOverride
+        // TODO timeoutInMs
+        // TODO commandInverval
+        // TODO dataValidTime
+        // TODO busyOffset
+        // TODO busyBitPolarity
+
+        const LOOKUP_TABLE_OFFSET: usize = 0x080;
         for (idx, byte) in self.lookup_table.iter().enumerate() {
             fcb.field_comment(
-                lookup_table_offset + idx,
+                LOOKUP_TABLE_OFFSET + idx,
                 &[*byte],
                 format!("lookupTable[{}]", idx,),
             );

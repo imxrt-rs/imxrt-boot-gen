@@ -56,9 +56,14 @@ as_ref_bytes_newtype!(CSSetupTime);
 /// Column address width
 pub struct ColumnAddressWidth([u8; 1]);
 impl ColumnAddressWidth {
-    /// Returns the value that represnts 'other devices'
+    /// Returns the value that represents 'other devices'
     pub fn other_devices() -> Self {
         ColumnAddressWidth([0])
+    }
+
+    /// Returns the value that represents 'HyperFlash' devices
+    pub fn hyper_flash() -> Self {
+        ColumnAddressWidth([3])
     }
 }
 
@@ -141,6 +146,11 @@ impl DeviceModeSequence {
 
 as_ref_bytes_newtype!(DeviceModeSequence);
 
+// TODO confCmdEnable
+// TODO configCmdSeqs
+// TODO cfgCmdArgs
+// TODO controllerMiscOption
+
 /// Describes the `deviceType` field.
 ///
 /// Only the SerialNOR is implemented; `DeviceType`
@@ -171,6 +181,8 @@ pub enum SerialClockFrequency {
     HMz133 = 8,
     MHz166 = 9,
 }
+
+// TODO lutCustomSeqEnable
 
 /// Type tag for `SerialFlashSize`
 pub struct A1;
@@ -207,3 +219,13 @@ impl<Region> Default for SerialFlashSize<Region> {
         Self::new(0)
     }
 }
+
+// TODO csPadSettingOverride
+// TODO sclkPadSettingOverride
+// TODO dataPadSettingOverride
+// TODO dqsPadSettingOverride
+// TODO timeoutInMs
+// TODO commandInverval
+// TODO dataValidTime
+// TODO busyOffset
+// TODO busyBitPolarity
