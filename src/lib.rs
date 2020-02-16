@@ -36,7 +36,7 @@
 //!
 //! The output is a single `u8` array, called `FIRMWARE_CONFIGURATION_BLOCK`.
 //! The name is not mangled. It may be referenced in a linker script by its section,
-//! `".fcb"`. These characteristics may be modified by the methods on the builder.
+//! `".fcb"`.
 
 #[macro_use]
 mod macros;

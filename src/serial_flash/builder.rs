@@ -121,7 +121,7 @@ impl Builder {
         // TODO dataValidTime
         // TODO busyOffset
         // TODO busyBitPolarity
-        
+
         match self.device_type {
             DeviceType::SerialNOR(norcb) => {
                 fcb.field_comment(0x1C0, &norcb.page_size, "pageSize");
@@ -140,15 +140,17 @@ impl Builder {
         const LOOKUP_TABLE_OFFSET: usize = 0x080;
         let mut offset = 0;
         for (seq, cmd) in self.lookup_table.iter() {
-            let cmd_name: String = cmd.map(|cmd_name| format!("{}: ", cmd_name)).unwrap_or_default();
-
             for instr in seq.0.iter() {
                 let raw = instr.raw();
-                fcb.field_comment(
-                    LOOKUP_TABLE_OFFSET + offset,
-                    &raw,
-                    format!("{}{} (RAW: {:?})", cmd_name, instr, instr),
-                );
+                if let Some(cmd) = cmd {
+                    fcb.field_comment(
+                        LOOKUP_TABLE_OFFSET + offset,
+                        &raw,
+                        format!("{}: {} (RAW: {:?})", cmd, instr, instr),
+                    );
+                } else {
+                    fcb.field(LOOKUP_TABLE_OFFSET + offset, &raw);
+                }
                 offset += raw.len();
             }
         }
