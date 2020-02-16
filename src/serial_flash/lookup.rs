@@ -4,8 +4,35 @@
 //! FCB. We provide accessors that let you interact with the lookup table as either
 //! a byte slice or slice of `u32`s.
 
-use std::mem;
-use std::ops::{Deref, DerefMut};
+use std::ops::Deref;
+
+use crate::flexspi_lut::seq_to_bytes;
+pub use crate::flexspi_lut::*;
+
+/// The default sequence definition lookup indices
+#[repr(usize)]
+pub enum SequenceCommand {
+    Read = 0,
+    ReadStatus = 1,
+    WriteEnable = 3,
+    EraseSector = 5,
+    PageProgram = 9,
+    ChipErase = 11,
+    Dummy = 15,
+}
+
+/// A handle to a sequence inside of the lookup table
+pub struct LutSeq<'a> {
+    table: &'a mut [u8],
+}
+
+impl<'a> LutSeq<'a> {
+    /// Sets the sequence in the lookup table to the supplied
+    /// sequence
+    pub fn set(&mut self, seq: Sequence) {
+        seq_to_bytes(seq, self.table);
+    }
+}
 
 /// Size of the lookup table in bytes
 const LOOKUP_TABLE_SIZE_BYTES: usize = 256;
@@ -13,16 +40,29 @@ const LOOKUP_TABLE_SIZE_BYTES: usize = 256;
 /// The lookup table, part of the general FCB memory region.
 ///
 /// `LookupTable` is a fixed-sized byte array. We provide convenience
-/// methods for inserting `u32`s into the table. Just as with slices,
-/// insertion of larger-sized types will panic if the computed offset
-/// is out of range.
+/// methods for inserting command sequences into the table.
 ///
 /// ```
-/// use imxrt_fcb_gen::serial_flash::LookupTable;
+/// use imxrt_fcb_gen::serial_flash::{
+///     LookupTable,
+///     SequenceCommand,
+///     Sequence, Instr,
+///     opcodes::sdr::*,
+///     Pads,
+///     STOP,
+/// };
 ///
 /// let mut lookup_table = LookupTable::new();
-/// lookup_table.insert_u32(0, 0xDEADBEEF);
-/// assert_eq!(lookup_table[3], 0xDE);
+/// lookup_table.command(SequenceCommand::Read).set(Sequence([
+///     Instr::new(CMD, Pads::One, 0xEB),
+///     Instr::new(RADDR, Pads::Four, 0x02),
+///     STOP,
+///     STOP,
+///     STOP,
+///     STOP,
+///     STOP,
+///     STOP,
+/// ]));
 /// ```
 pub struct LookupTable([u8; LOOKUP_TABLE_SIZE_BYTES]);
 
@@ -38,18 +78,15 @@ impl LookupTable {
         Self::default()
     }
 
-    /// Treat the underlying memory as a `u32` slice, and insert
-    /// `value` at the `u32_index`.
-    ///
-    /// The value will be serialized as a little-endian value.
-    ///
-    /// # Panic
-    ///
-    /// Panics if the computed index is out of range.
-    pub fn insert_u32(&mut self, u32_index: usize, value: u32) {
-        let start = u32_index * mem::size_of::<u32>();
-        let end = start + mem::size_of::<u32>();
-        self.0[start..end].copy_from_slice(&value.to_le_bytes());
+    pub fn command(&mut self, cmd: SequenceCommand) -> LutSeq {
+        // Two bytes per instruction, and eight instructions
+        // in a sequence.
+        const INDEX_TO_BYTE_OFFSET: usize = 8 * 2;
+        let start = (cmd as usize) * INDEX_TO_BYTE_OFFSET;
+        let end = start + INDEX_TO_BYTE_OFFSET;
+        LutSeq {
+            table: &mut self.0[start..end],
+        }
     }
 }
 
@@ -61,52 +98,31 @@ impl Deref for LookupTable {
     }
 }
 
-impl DerefMut for LookupTable {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
 impl AsRef<[u8]> for LookupTable {
     fn as_ref(&self) -> &[u8] {
         &self.0
     }
 }
 
-impl AsMut<[u8]> for LookupTable {
-    fn as_mut(&mut self) -> &mut [u8] {
-        &mut self.0
-    }
-}
-
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
+    /// Show that the sequence commands index into the correct
+    /// place in the u8 array
     #[test]
-    fn little_endian() {
-        let mut lt = LookupTable::default();
-        lt.insert_u32(0, 0xDEADBEEF);
-        assert_eq!(lt[0], 0xEF);
-        assert_eq!(lt[1], 0xBE);
-        assert_eq!(lt[2], 0xAD);
-        assert_eq!(lt[3], 0xDE);
-    }
-
-    #[test]
-    #[should_panic]
-    fn out_of_range() {
-        let mut lt = LookupTable::default();
-        lt.insert_u32(64, 0);
-    }
-
-    #[test]
-    fn end_of_table() {
-        let mut lt = LookupTable::default();
-        lt.insert_u32(63, (0xAC1D << 16) | 0x1D1C);
-        assert_eq!(lt[255], 0xAC);
-        assert_eq!(lt[254], 0x1D);
-        assert_eq!(lt[253], 0x1D);
-        assert_eq!(lt[252], 0x1C);
+    fn sequence_command_offset() {
+        let mut lut = LookupTable::new();
+        lut.command(SequenceCommand::ChipErase).set(Sequence([
+            Instr::new(opcodes::sdr::CMD, Pads::Two, 0xDE),
+            STOP,
+            STOP,
+            STOP,
+            STOP,
+            STOP,
+            STOP,
+            STOP,
+        ]));
+        assert_eq!(lut[11 * 16], 0xDE);
     }
 }

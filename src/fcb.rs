@@ -28,7 +28,7 @@ static OFFSETS_OF_RESERVED: &[std::ops::Range<usize>] = &[
 pub struct FCB {
     /// The raw contents of the FCB. Exposed in the crate so that
     /// we can test its contents.
-    pub(crate) raw: [u8; FCB_SIZE],
+    raw: [u8; FCB_SIZE],
     /// Associated comments for each byte in the FCB. These
     /// will become Rust `//` comment tags
     comments: Vec<String>,
@@ -99,6 +99,20 @@ impl FCB {
     ) {
         self.field(offset, bytes);
         self.comments[offset] = comment.to_string();
+    }
+}
+
+impl AsRef<[u8]> for FCB {
+    fn as_ref(&self) -> &[u8] {
+        &self.raw
+    }
+}
+
+impl std::ops::Deref for FCB {
+    type Target = [u8];
+
+    fn deref(&self) -> &[u8] {
+        &self.raw
     }
 }
 
