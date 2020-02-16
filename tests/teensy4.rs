@@ -1,7 +1,7 @@
-//! Firmware configuration block for the Teensy 4
+//! FlexSPI configuration block for the Teensy 4
 
-use imxrt_fcb_gen::serial_flash::opcodes::sdr::*;
-use imxrt_fcb_gen::serial_flash::*;
+use imxrt_boot_gen::serial_flash::opcodes::sdr::*;
+use imxrt_boot_gen::serial_flash::*;
 
 //
 // Sequences for lookup table
@@ -81,7 +81,7 @@ fn teensy4_fcb() {
         ip_cmd_serial_clk_freq: nor::SerialClockFrequency::MHz30,
     };
     let lookup_table = {
-        use imxrt_fcb_gen::serial_flash::CommandSequence::*;
+        use imxrt_boot_gen::serial_flash::CommandSequence::*;
         let mut lut = LookupTable::new();
         lut[Read] = SEQ_READ;
         lut[ReadStatus] = SEQ_READ_STATUS;

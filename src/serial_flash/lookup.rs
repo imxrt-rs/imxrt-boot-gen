@@ -48,7 +48,7 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 /// to your FLASH chip's refence manual.
 ///
 /// ```
-/// use imxrt_fcb_gen::serial_flash::{
+/// use imxrt_boot_gen::serial_flash::{
 ///     LookupTable,
 ///     CommandSequence,
 ///     Sequence, Instr,

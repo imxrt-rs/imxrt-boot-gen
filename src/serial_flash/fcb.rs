@@ -1,4 +1,4 @@
-//! Firmware configuration block (FCB)
+//! FlexSPI configuration block (FCB)
 
 use std::collections::HashSet;
 use std::fmt;
@@ -18,11 +18,11 @@ static OFFSETS_OF_RESERVED: &[std::ops::Range<usize>] = &[
     0x1CC..0x200,
 ];
 
-/// The firmware configuration block
+/// The FlexSPI configuration block
 ///
 /// The `FCB` contains all the information to create the FCB code.
 /// It implements `Display`, and it will display itself as a formatted,
-/// commented Rust array. The array is called `FIRMWARE_CONFIGURATION_BLOCK`.
+/// commented Rust array. The array is called `FLEXSPI_CONFIGURATION_BLOCK`.
 /// It's 512 bytes large. It has comments that describe the element offsets
 /// and usage of the value.
 pub struct FCB {
@@ -122,7 +122,7 @@ impl fmt::Display for FCB {
             r#"
 #[link_section = ".fcb"]
 #[no_mangle]
-pub static FIRMWARE_CONFIGURATION_BLOCK: [u8; 512] = ["#,
+pub static FLEXSPI_CONFIGURATION_BLOCK: [u8; 512] = ["#,
         )?;
         for (idx, (value, comment)) in self.raw.iter().zip(self.comments.iter()).enumerate() {
             writeln!(f, "    0x{:02X}, // 0x{:03X} {}", *value, idx, comment)?;

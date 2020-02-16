@@ -1,12 +1,12 @@
 [package]
-name = "imxrt-fcb-gen"
+name = "imxrt-boot-gen"
 version = "0.1.0"
 authors = ["Ian McIntyre <ianpmcintyre@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/imxrt-rs/imxrt-fcb-gen"
+repository = "https://github.com/imxrt-rs/imxrt-boot-gen"
 description = """
-Generate Firmware Configuration Block (FCB) for iMXRT processors in Rust build scripts.
+Generate data structures for booting iMXRT processors. Usable in Rust build scripts.
 """
 categories = [
     "embedded",

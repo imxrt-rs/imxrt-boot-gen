@@ -1,34 +1,37 @@
-//! A library for generating an iMXRT Firmware Configuration Block (FCB)
-//! from Rust. Intended for use in `build.rs` build scripts to generate
-//! FCBs for iMXRT-based systems.
+//! A library for generating data structures required to boot iMXRT systems. Intended
+//! for generating Rust code in build scripts.
 //!
 //! # Rationale
 //!
-//! The iMXRT Firmware Configuration Block (FCB) is an array that
+//! iMXRT processors require certain data structures in flash in order to configure
+//! FlexSPI and / or SEMC peripherals. A FlexSPI Configuration Block (FCB) is an array that
 //! describes how the processor should initiate a boot. It's expected to be placed
 //! in a certain region of FLASH, with values that describe how a peripheral should
 //! interact with NAND- / NOR-based FLASH memory. The raw FCB has a lot of magic
 //! numbers, and it would be nice to have an API to generate the FCB.
 //!
-//! The `imxrt-fcb-gen` crate provides an API for generating the FCB. As of this
+//! The `imxrt-boot-gen` crate provides an API for generating the FCB. As of this
 //! writing, it supports only the generation of an FCB for reading NOR Flash via
 //! FlexSPI. Other configurations, such as NAND Flash and / or the SEMC interface,
 //! may be added later.
 //!
 //! # Usage
 //!
-//! Add `imxrt-fcb-gen` to your build dependencies, and select your processor with a feature flag:
+//! Add `imxrt-boot-gen` to your build dependencies, and select your processor with a feature flag:
 //!
 //! ```toml
 //! [build-dependencies]
-//! imxrt-fcb-gen = { features = ["imxrt1062"] }
+//! imxrt-boot-gen = { features = ["imxrt1062"] }
 //! ```
+//!
+//! The rest of this documentation will describe the API for defining a FlexSPI configuration block
+//! (FCB).
 //!
 //! Prepare a `build.rs` script. Import all types from the kind of FCB that you're generating, and
 //! create a `Builder`.
 //!
 //! ```
-//! use imxrt_fcb_gen::serial_flash::*; // Booting from serial flash
+//! use imxrt_boot_gen::serial_flash::*; // Booting from serial flash
 //!
 //! let mut builder = Builder {
 //!     read_sample_clock_source: ReadSampleClockSource::LoopbackFromDQSPad,
@@ -65,7 +68,7 @@
 //! to utilize all eight instructions.
 //!
 //! ```
-//! use imxrt_fcb_gen::{
+//! use imxrt_boot_gen::{
 //!     serial_flash::*, // All contents from serial flash
 //!     serial_flash::opcodes::sdr::*, // All SDR instruction opcodes
 //! };
@@ -132,7 +135,7 @@
 //! as a Rust array with the ABI guarantees described below.
 //!
 //! ```no_run
-//! # use imxrt_fcb_gen::serial_flash::*; // Booting from serial flash
+//! # use imxrt_boot_gen::serial_flash::*; // Booting from serial flash
 //! use std::fs::File;
 //! use std::io::Write;
 //!
@@ -166,13 +169,12 @@
 //!
 //! # ABI
 //!
-//! The output is a single, 512-byte `u8` array, called `FIRMWARE_CONFIGURATION_BLOCK`.
+//! The output is a single, 512-byte `u8` array, called `FLEXSPI_CONFIGURATION_BLOCK`.
 //! The name is not mangled. It may be referenced in a linker script by its section,
 //! `".fcb"`. Given the ABI guarantees, the FCB should be usable from both Rust and C.
 
 #[macro_use]
 mod macros;
 
-mod fcb;
 mod flexspi_lut;
 pub mod serial_flash;

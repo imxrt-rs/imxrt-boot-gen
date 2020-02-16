@@ -1,12 +1,16 @@
-# imxrt-fcb-gen
+# imxrt-boot-gen
 
-Define an iMXRT firmware configuration block (FBC) in Rust.
+Generate iMXRT data structures that are required for booting.
+
+## Terms
+
+- Flex Serial Peripheral Interface (FlexSPI) Configuration Block (FCB), a data structure that describes how the processor interfaces flash devices via FlexSPI. It's an array of magic numbers placed in flash at a known location. Suitable for serial NOR and NAND flash booting.
 
 ## Rationale
 
-A firmware configuration block (FCB) is an array of memory that defines how the processor should read from flash. It is placed in a known location in flash. FCBs are typically written by hand. If you're defining a FCB in C, you can use structs and macros to define the FCB layout and values. The approach, however, isn't great for catching invalid values at compile time. This crate takes a different, more radical approach, by using Rust to generate the FCB at compile time.
+This crate lets you define the FCB in Rust. FCBs are typically written by hand. If you're defining a FCB in C, you can use structs and macros to define the FCB layout and values. The approach, however, isn't great for catching invalid values at compile time. This crate takes a different, more radical approach, by using Rust to generate the structures at compile time.
 
-`imxrt-fcb-gen` provides an API for FCB generation. Use it in another crate's `build.rs` to define the FCB, and write it to a file:
+`imxrt-boot-gen` provides an API for FCB generation. Use it in another crate's `build.rs` to define the FCB, and write it to a file:
 
 ```rust
 let builder = Builder {
@@ -35,7 +39,7 @@ Your crate now exports a FCB that resembles
 ```rust
 #[link_section = ".fcb"]
 #[no_mangle]
-pub static FIRMWARE_CONFIGURATION_BLOCK: [u8; 512] = [
+pub static FLEXSPI_CONFIGURATION_BLOCK: [u8; 512] = [
     0x46, // 0x000 Tag 'FCFB'
     0x43, // 0x001 
     0x46, // 0x002 
@@ -52,7 +56,7 @@ You may now link that crate into another executable. Make sure that you place th
 
 ## ABI
 
-The generated FCB has the symbol `FIRMWARE_CONFIGURATION_BLOCK`. The symbol is not mangled. The memory is an array of 512 `u8`s. It has a link section of `".fcb"`. The ABI ensures compatibility with both Rust and C. Indeed, by building a C static library from your Rust crate, you can link the FCB into other C applications that target the iMXRT processor family.
+The generated FCB has the symbol `FLEXSPI_CONFIGURATION_BLOCK`. The symbol is not mangled. The memory is an array of 512 `u8`s. It has a link section of `".fcb"`. The ABI ensures compatibility with both Rust and C. By building a C static library from your Rust crate, you can link the FCB into other C applications that target the iMXRT processor family.
 
 ## Supported Processors
 
@@ -71,9 +75,9 @@ Select your processor by enabling the corresponding feature:
 
 ```toml
 [build-dependencies]
-imxrt-fcb-gen = { features = ["imxrt1062"] }
+imxrt-boot-gen = { features = ["imxrt1062"] }
 ```
 
 ## Examples
 
-See the [`teensy4-fcb` crate](https://crates.io/crates/teensy4-fcb) for an example of how to use the `imxrt-fcb-gen` crate.
+See the [`teensy4-fcb` crate](https://crates.io/crates/teensy4-fcb) for an example of how to use the `imxrt-boot-gen` crate.

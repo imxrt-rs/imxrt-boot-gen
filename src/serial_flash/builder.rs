@@ -1,12 +1,12 @@
 //! The `Builder`
 //!
-//! The builder turns fields into the FCB.
+//! The builder turns fields into the FlexSPI configuration block.
 
+use super::fcb;
 use super::fields::*;
 use super::lookup::LookupTable;
-use crate::fcb;
 
-/// Builder for a firmware configuration block
+/// Builder for a FlexSPI configuration block
 /// that configures reads from serial flash.
 ///
 /// See the documentation on the types for more information.
