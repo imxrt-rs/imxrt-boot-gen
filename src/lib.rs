@@ -7,7 +7,7 @@
 //! The iMXRT Firmware Configuration Block (FCB) is an array that
 //! describes how the processor should initiate a boot. It's expected to be placed
 //! in a certain region of FLASH, with values that describe how a peripheral should
-//! interact with NAND- / NOR-based FLASH memory. The FCB has a lot of magic
+//! interact with NAND- / NOR-based FLASH memory. The raw FCB has a lot of magic
 //! numbers, and it would be nice to have an API to generate the FCB.
 //!
 //! The `imxrt-fcb-gen` crate provides an API for generating the FCB. As of this
@@ -17,11 +17,11 @@
 //!
 //! # Usage
 //!
-//! Add `imxrt-fcb-gen` to your build dependencies:
+//! Add `imxrt-fcb-gen` to your build dependencies, and select your processor with a feature flag:
 //!
 //! ```toml
 //! [build-dependencies]
-//! imxrt-fcb-gen = { path = "../imxrt-fcb-gen" }
+//! imxrt-fcb-gen = { features = ["imxrt1062"] }
 //! ```
 //!
 //! Then, instantiate a `Builder` in your `build.rs` build script. Unless a
@@ -34,7 +34,7 @@
 //!
 //! # ABI
 //!
-//! The output is a single `u8` array, called `FIRMWARE_CONFIGURATION_BLOCK`.
+//! The output is a single, 512-byte `u8` array, called `FIRMWARE_CONFIGURATION_BLOCK`.
 //! The name is not mangled. It may be referenced in a linker script by its section,
 //! `".fcb"`.
 

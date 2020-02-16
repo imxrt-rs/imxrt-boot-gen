@@ -1,7 +1,7 @@
 //! FlexSPI Lookup Table (LUT) instructions, opcodes, and sequences
 //!
 //! Derived from the iMXRT1060 Reference Manual (Rev 2),
-//! section 27.5.8
+//! section 27.5.8.
 
 use std::fmt;
 
@@ -10,6 +10,7 @@ pub(crate) const INSTRUCTION_SIZE: usize = 2;
 /// A FlexSPI instruction
 #[derive(Clone, Copy)]
 pub struct Instr {
+    /// Raw instructions
     raw: [u8; INSTRUCTION_SIZE],
     opcode: Opcode,
     pads: Pads,

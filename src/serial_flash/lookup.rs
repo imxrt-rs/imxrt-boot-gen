@@ -1,14 +1,14 @@
 //! Lookup table
-//!
-//! The lookup table is a 256 byte array of commands that's part of the general
-//! FCB. We provide accessors that let you interact with the lookup table as either
-//! a byte slice or slice of `u32`s.
 
 use std::ops::{Index, IndexMut};
 
 pub use crate::flexspi_lut::*;
 
 /// The default sequence definition lookup indices
+/// 
+/// `SequenceCommand`s are looked up by the processor when it needs to
+/// interact with the flash chip. The enumeration lets us index back into
+/// the `Lookup` struct, and associate a sequence command for that action.
 #[repr(usize)]
 pub enum SequenceCommand {
     Read = 0,
@@ -43,7 +43,9 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 /// The lookup table, part of the general FCB memory region.
 ///
 /// `LookupTable` is a fixed-sized byte array. We provide convenience
-/// methods for inserting command sequences into the table.
+/// methods for inserting command sequences into the table. The contents
+/// of sequences are based on the FLASH chip that we're talking to. Refer
+/// to your FLASH chip's refence manual.
 ///
 /// ```
 /// use imxrt_fcb_gen::serial_flash::{

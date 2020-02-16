@@ -26,8 +26,7 @@ static OFFSETS_OF_RESERVED: &[std::ops::Range<usize>] = &[
 /// It's 512 bytes large. It has comments that describe the element offsets
 /// and usage of the value.
 pub struct FCB {
-    /// The raw contents of the FCB. Exposed in the crate so that
-    /// we can test its contents.
+    /// The raw contents of the FCB.
     raw: [u8; FCB_SIZE],
     /// Associated comments for each byte in the FCB. These
     /// will become Rust `//` comment tags

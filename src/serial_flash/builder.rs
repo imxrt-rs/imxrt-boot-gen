@@ -1,6 +1,6 @@
-//! The `Builder` API
+//! The `Builder`
 //!
-//! The builder turns the fields into the FCB.
+//! The builder turns fields into the FCB.
 
 use super::fields::*;
 use super::lookup::LookupTable;

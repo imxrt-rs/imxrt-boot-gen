@@ -21,6 +21,7 @@ pub enum ReadSampleClockSource {
 pub struct CSHoldTime([u8; 1]);
 
 impl CSHoldTime {
+    /// Specify a hold time
     pub fn new(hold_time: u8) -> Self {
         CSHoldTime([hold_time])
     }
@@ -40,6 +41,7 @@ as_ref_bytes_newtype!(CSHoldTime);
 pub struct CSSetupTime([u8; 1]);
 
 impl CSSetupTime {
+    /// Specify a setup time
     pub fn new(setup_time: u8) -> Self {
         CSSetupTime([setup_time])
     }
@@ -87,7 +89,11 @@ as_ref_bytes_newtype!(DeviceModeArgument);
 /// the configuration is enabled.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum DeviceModeConfiguration {
+    /// Device configuration mode is disabled
     Disabled,
+    /// Device configuration mode is enabled
+    /// 
+    /// Tells the processor to use the associated `DeviceModeArgument`
     Enabled(DeviceModeArgument),
 }
 
@@ -179,7 +185,7 @@ pub enum SerialClockFrequency {
     MHz100 = 6,
     MHz120 = 7,
     MHz133 = 8,
-    #[cfg(any(feature = "imxrt1062", feature = "imxrt1064"))]
+    #[cfg(any(feature = "imxrt1061", feature = "imxrt1062", feature = "imxrt1064"))]
     MHz166 = 9,
 }
 
