@@ -18,7 +18,7 @@ const LOOKUP_TABLE_SIZE_BYTES: usize = 256;
 /// is out of range.
 ///
 /// ```
-/// use imxrt_fcb_gen::LookupTable;
+/// use imxrt_fcb_gen::serial_flash::LookupTable;
 ///
 /// let mut lookup_table = LookupTable::new();
 /// lookup_table.insert_u32(0, 0xDEADBEEF);

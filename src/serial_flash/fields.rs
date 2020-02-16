@@ -156,7 +156,7 @@ as_ref_bytes_newtype!(DeviceModeSequence);
 /// Only the SerialNOR is implemented; `DeviceType`
 /// may also have `SerialNAND` in the future.
 pub enum DeviceType {
-    SerialNOR(crate::nor::ConfigurationBlock),
+    SerialNOR(super::nor::ConfigurationBlock),
 }
 
 /// `sFlashPad` field
@@ -178,7 +178,8 @@ pub enum SerialClockFrequency {
     MHz80 = 5,
     MHz100 = 6,
     MHz120 = 7,
-    HMz133 = 8,
+    MHz133 = 8,
+    #[cfg(any(feature = "imxrt1062", feature = "imxrt1064"))]
     MHz166 = 9,
 }
 

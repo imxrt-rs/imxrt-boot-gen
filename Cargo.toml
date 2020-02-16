@@ -7,7 +7,6 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/mciantyre/teensy4-rs"
 description = """
 Generate Firmware Configuration Block (FCB) for iMXRT processors in Rust build scripts.
-Part of the teensy4-rs project.
 """
 categories = [
     "embedded",
@@ -20,6 +19,9 @@ keywords = [
     "imxrt",
 ]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+
+[features]
+imxrt1011 = []
+imxrt1062 = []
+imxrt1064 = []

@@ -2,9 +2,9 @@
 //!
 //! The builder turns the fields into the FCB.
 
+use super::fields::*;
+use super::lookup::LookupTable;
 use crate::fcb;
-use crate::fields::*;
-use crate::lookup::LookupTable;
 
 /// Builder for a firmware configuration block
 /// definition
@@ -144,8 +144,8 @@ impl Builder {
 
 #[cfg(test)]
 mod test {
+    use super::super::nor;
     use super::*;
-    use crate::nor;
 
     #[test]
     fn teensy4_fcb() {

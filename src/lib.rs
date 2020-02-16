@@ -43,7 +43,7 @@
 //! The example below demonstrates how we might define the FCB for a Teensy 4.
 //!
 //! ```rust
-//! use imxrt_fcb_gen::*;
+//! use imxrt_fcb_gen::serial_flash::*;
 //!
 //! // We're using serial NOR flash.
 //! let nor_cb = nor::ConfigurationBlock {
@@ -123,14 +123,5 @@
 #[macro_use]
 mod macros;
 
-mod builder;
 mod fcb;
-mod fields;
-mod lookup;
-
-pub mod nor;
-
-pub use builder::*;
-pub use fcb::*;
-pub use fields::*;
-pub use lookup::*;
+pub mod serial_flash;
