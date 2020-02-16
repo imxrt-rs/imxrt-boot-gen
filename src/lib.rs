@@ -124,4 +124,5 @@
 mod macros;
 
 mod fcb;
+pub mod flexspi_lut;
 pub mod serial_flash;
