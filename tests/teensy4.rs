@@ -81,7 +81,7 @@ fn teensy4_fcb() {
         ip_cmd_serial_clk_freq: nor::SerialClockFrequency::MHz30,
     };
     let lookup_table = {
-        use imxrt_fcb_gen::serial_flash::SequenceCommand::*;
+        use imxrt_fcb_gen::serial_flash::CommandSequence::*;
         let mut lut = LookupTable::new();
         lut[Read] = SEQ_READ;
         lut[ReadStatus] = SEQ_READ_STATUS;

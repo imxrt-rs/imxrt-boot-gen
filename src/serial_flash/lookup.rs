@@ -5,12 +5,12 @@ use std::ops::{Index, IndexMut};
 pub use crate::flexspi_lut::*;
 
 /// The default sequence definition lookup indices
-/// 
-/// `SequenceCommand`s are looked up by the processor when it needs to
+///
+/// `CommandSequence`s are looked up by the processor when it needs to
 /// interact with the flash chip. The enumeration lets us index back into
 /// the `Lookup` struct, and associate a sequence command for that action.
 #[repr(usize)]
-pub enum SequenceCommand {
+pub enum CommandSequence {
     Read = 0,
     ReadStatus = 1,
     WriteEnable = 3,
@@ -20,9 +20,9 @@ pub enum SequenceCommand {
     Dummy = 15,
 }
 
-impl SequenceCommand {
+impl CommandSequence {
     fn command_index_name(idx: usize) -> Option<&'static str> {
-        use SequenceCommand::*;
+        use CommandSequence::*;
         match idx {
             idx if idx == Read as usize => Some("READ"),
             idx if idx == ReadStatus as usize => Some("READ_STATUS"),
@@ -50,7 +50,7 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 /// ```
 /// use imxrt_fcb_gen::serial_flash::{
 ///     LookupTable,
-///     SequenceCommand,
+///     CommandSequence,
 ///     Sequence, Instr,
 ///     opcodes::sdr::*,
 ///     Pads,
@@ -58,7 +58,7 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 /// };
 ///
 /// let mut lookup_table = LookupTable::new();
-/// lookup_table[SequenceCommand::Read] = Sequence([
+/// lookup_table[CommandSequence::Read] = Sequence([
 ///     Instr::new(CMD, Pads::One, 0xEB),
 ///     Instr::new(RADDR, Pads::Four, 0x02),
 ///     STOP,
@@ -87,20 +87,20 @@ impl LookupTable {
         self.0
             .iter()
             .enumerate()
-            .map(|(idx, instr)| (instr, SequenceCommand::command_index_name(idx)))
+            .map(|(idx, instr)| (instr, CommandSequence::command_index_name(idx)))
     }
 }
 
-impl Index<SequenceCommand> for LookupTable {
+impl Index<CommandSequence> for LookupTable {
     type Output = Sequence;
 
-    fn index(&self, cmd: SequenceCommand) -> &Sequence {
+    fn index(&self, cmd: CommandSequence) -> &Sequence {
         &self.0[cmd as usize]
     }
 }
 
-impl IndexMut<SequenceCommand> for LookupTable {
-    fn index_mut(&mut self, cmd: SequenceCommand) -> &mut Sequence {
+impl IndexMut<CommandSequence> for LookupTable {
+    fn index_mut(&mut self, cmd: CommandSequence) -> &mut Sequence {
         &mut self.0[cmd as usize]
     }
 }

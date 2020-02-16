@@ -92,7 +92,7 @@ pub enum DeviceModeConfiguration {
     /// Device configuration mode is disabled
     Disabled,
     /// Device configuration mode is enabled
-    /// 
+    ///
     /// Tells the processor to use the associated `DeviceModeArgument`
     Enabled(DeviceModeArgument),
 }
