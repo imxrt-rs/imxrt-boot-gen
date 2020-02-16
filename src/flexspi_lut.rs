@@ -64,11 +64,8 @@ impl fmt::Display for Instr {
 
 impl fmt::Debug for Instr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "[{:?}, {:?}, {:#02X}]",
-            self.opcode, self.pads, self.raw[0]
-        )
+        let raw = u16::from_le_bytes(self.raw);
+        write!(f, "{:#02X}", raw)
     }
 }
 

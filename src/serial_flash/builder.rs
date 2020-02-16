@@ -139,17 +139,21 @@ impl Builder {
     fn serialze_lookup(&self, fcb: &mut fcb::FCB) {
         const LOOKUP_TABLE_OFFSET: usize = 0x080;
         let mut offset = 0;
-        for (seq, cmd) in self.lookup_table.iter() {
+        for (seq_idx, (seq, cmd)) in self.lookup_table.iter().enumerate() {
             for instr in seq.0.iter() {
                 let raw = instr.raw();
                 if let Some(cmd) = cmd {
                     fcb.field_comment(
                         LOOKUP_TABLE_OFFSET + offset,
                         &raw,
-                        format!("{}: {} (RAW: {:?})", cmd, instr, instr),
+                        format!("(LUT[{}]) {}: {}", seq_idx, cmd, instr),
                     );
                 } else {
-                    fcb.field(LOOKUP_TABLE_OFFSET + offset, &raw);
+                    fcb.field_comment(
+                        LOOKUP_TABLE_OFFSET + offset,
+                        &raw,
+                        format!("(LUT[{}])", seq_idx),
+                    );
                 }
                 offset += raw.len();
             }
