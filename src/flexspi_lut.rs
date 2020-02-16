@@ -1,22 +1,16 @@
-//! FlexSPI Lookup Table (LUT) instruction set
+//! FlexSPI Lookup Table (LUT) instructions, opcodes, and sequences
 //!
 //! Derived from the iMXRT1060 Reference Manual (Rev 2),
 //! section 27.5.8
 
 use std::fmt;
 
-/// Converts a sequence to bytes
-pub(crate) fn seq_to_bytes(seq: Sequence, buffer: &mut [u8]) {
-    buffer
-        .chunks_exact_mut(2)
-        .zip(seq.0.iter())
-        .for_each(|(dst, src)| dst.copy_from_slice(&src.raw));
-}
+pub(crate) const INSTRUCTION_SIZE: usize = 2;
 
 /// A FlexSPI instruction
 #[derive(Clone, Copy)]
 pub struct Instr {
-    raw: [u8; 2],
+    raw: [u8; INSTRUCTION_SIZE],
     opcode: Opcode,
     pads: Pads,
 }
@@ -34,7 +28,7 @@ impl Instr {
 
     const fn stop() -> Self {
         Instr {
-            raw: [0; 2],
+            raw: [0; INSTRUCTION_SIZE],
             opcode: opcodes::STOP,
             pads: Pads::One, // unused
         }
@@ -42,7 +36,7 @@ impl Instr {
 
     const fn jump_on_cs() -> Self {
         Instr {
-            raw: [0; 2],
+            raw: [0; INSTRUCTION_SIZE],
             opcode: opcodes::JUMP_ON_CS,
             pads: Pads::One, // unused
         }
@@ -59,14 +53,22 @@ impl fmt::Display for Instr {
         match self.opcode {
             opcodes::STOP => write!(f, "STOP"),
             opcodes::JUMP_ON_CS => write!(f, "JUMP_ON_CS"),
-            opcode => write!(f, "{},{},{:#02X}", opcode, self.pads, self.raw[0]),
+            opcode => write!(
+                f,
+                "OPCODE={}, PADS={}, OPERAND={:#02X}",
+                opcode, self.pads, self.raw[0]
+            ),
         }
     }
 }
 
 impl fmt::Debug for Instr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?},{:?},{:#02X}", self.opcode, self.pads, self.raw[0])
+        write!(
+            f,
+            "[{:?}, {:?}, {:#02X}]",
+            self.opcode, self.pads, self.raw[0]
+        )
     }
 }
 
@@ -75,8 +77,18 @@ pub const STOP: Instr = Instr::stop();
 /// JUMP_ON_CS instruction
 pub const JUMP_ON_CS: Instr = Instr::jump_on_cs();
 
+pub(crate) const INSTRUCTIONS_PER_SEQUENCE: usize = 8;
+
 /// A collection of FlexSPI LUT instructions
-pub struct Sequence(pub [Instr; 8]);
+#[derive(Clone, Copy)]
+pub struct Sequence(pub [Instr; INSTRUCTIONS_PER_SEQUENCE]);
+pub(crate) const SEQUENCE_SIZE: usize = INSTRUCTIONS_PER_SEQUENCE * INSTRUCTION_SIZE;
+
+impl Sequence {
+    pub(crate) const fn stopped() -> Self {
+        Sequence([STOP; INSTRUCTIONS_PER_SEQUENCE])
+    }
+}
 
 impl fmt::Display for Sequence {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -107,13 +119,13 @@ pub enum Pads {
 
 impl fmt::Display for Pads {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let parenthetical = match *self {
-            Pads::One => "single",
-            Pads::Two => "dual",
-            Pads::Four => "quad",
-            Pads::Eight => "octal",
+        let pads = match *self {
+            Pads::One => "SINGLE",
+            Pads::Two => "DUAL",
+            Pads::Four => "QUAD",
+            Pads::Eight => "OCTAL",
         };
-        write!(f, "{:#02X} ({})", *self as u8, parenthetical)
+        write!(f, "{}", pads)
     }
 }
 
@@ -272,8 +284,11 @@ mod test {
     use super::STOP;
 
     fn seq_to_bytes(seq: Sequence) -> Vec<u8> {
-        let mut buffer = vec![0; 16];
-        super::seq_to_bytes(seq, &mut buffer);
+        let mut buffer = vec![0; super::SEQUENCE_SIZE];
+        buffer
+            .chunks_exact_mut(2)
+            .zip(seq.0.iter())
+            .for_each(|(dst, src)| dst.copy_from_slice(&src.raw));
         buffer
     }
 
@@ -285,7 +300,7 @@ mod test {
 
     #[test]
     fn teensy4_read() {
-        const EXPECTED: [u8; 16] = [
+        const EXPECTED: [u8; super::SEQUENCE_SIZE] = [
             0xEB, 0x04, 0x18, 0x0A, 0x06, 0x32, 0x04, 0x26, 0, 0, 0, 0, 0, 0, 0, 0,
         ];
 

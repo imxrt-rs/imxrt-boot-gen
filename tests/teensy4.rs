@@ -83,12 +83,12 @@ fn teensy4_fcb() {
     let lookup_table = {
         use imxrt_fcb_gen::serial_flash::SequenceCommand::*;
         let mut lut = LookupTable::new();
-        lut.command(Read).set(SEQ_READ);
-        lut.command(ReadStatus).set(SEQ_READ_STATUS);
-        lut.command(WriteEnable).set(SEQ_WRITE_ENABLE);
-        lut.command(EraseSector).set(SEQ_ERASE_SECTOR);
-        lut.command(PageProgram).set(SEQ_PAGE_PROGRAM);
-        lut.command(ChipErase).set(SEQ_CHIP_ERASE);
+        lut[Read] = SEQ_READ;
+        lut[ReadStatus] = SEQ_READ_STATUS;
+        lut[WriteEnable] = SEQ_WRITE_ENABLE;
+        lut[EraseSector] = SEQ_ERASE_SECTOR;
+        lut[PageProgram] = SEQ_PAGE_PROGRAM;
+        lut[ChipErase] = SEQ_CHIP_ERASE;
         lut
     };
     let builder = Builder {

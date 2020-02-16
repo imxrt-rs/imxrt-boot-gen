@@ -4,9 +4,8 @@
 //! FCB. We provide accessors that let you interact with the lookup table as either
 //! a byte slice or slice of `u32`s.
 
-use std::ops::Deref;
+use std::ops::{Index, IndexMut};
 
-use crate::flexspi_lut::seq_to_bytes;
 pub use crate::flexspi_lut::*;
 
 /// The default sequence definition lookup indices
@@ -21,21 +20,25 @@ pub enum SequenceCommand {
     Dummy = 15,
 }
 
-/// A handle to a sequence inside of the lookup table
-pub struct LutSeq<'a> {
-    table: &'a mut [u8],
-}
-
-impl<'a> LutSeq<'a> {
-    /// Sets the sequence in the lookup table to the supplied
-    /// sequence
-    pub fn set(&mut self, seq: Sequence) {
-        seq_to_bytes(seq, self.table);
+impl SequenceCommand {
+    fn command_index_name(idx: usize) -> Option<&'static str> {
+        use SequenceCommand::*;
+        match idx {
+            idx if idx == Read as usize => Some("READ"),
+            idx if idx == ReadStatus as usize => Some("READ_STATUS"),
+            idx if idx == WriteEnable as usize => Some("WRITE_ENABLE"),
+            idx if idx == EraseSector as usize => Some("ERASE_SECTOR"),
+            idx if idx == PageProgram as usize => Some("PAGE_PROGRAM"),
+            idx if idx == ChipErase as usize => Some("CHIP_ERASE"),
+            idx if idx == Dummy as usize => Some("DUMMY"),
+            _ => None,
+        }
     }
 }
 
 /// Size of the lookup table in bytes
 const LOOKUP_TABLE_SIZE_BYTES: usize = 256;
+const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 
 /// The lookup table, part of the general FCB memory region.
 ///
@@ -53,7 +56,7 @@ const LOOKUP_TABLE_SIZE_BYTES: usize = 256;
 /// };
 ///
 /// let mut lookup_table = LookupTable::new();
-/// lookup_table.command(SequenceCommand::Read).set(Sequence([
+/// lookup_table[SequenceCommand::Read] = Sequence([
 ///     Instr::new(CMD, Pads::One, 0xEB),
 ///     Instr::new(RADDR, Pads::Four, 0x02),
 ///     STOP,
@@ -62,13 +65,13 @@ const LOOKUP_TABLE_SIZE_BYTES: usize = 256;
 ///     STOP,
 ///     STOP,
 ///     STOP,
-/// ]));
+/// ]);
 /// ```
-pub struct LookupTable([u8; LOOKUP_TABLE_SIZE_BYTES]);
+pub struct LookupTable([Sequence; NUMBER_OF_SEQUENCES]);
 
 impl Default for LookupTable {
     fn default() -> LookupTable {
-        LookupTable([0; LOOKUP_TABLE_SIZE_BYTES])
+        LookupTable([Sequence::stopped(); NUMBER_OF_SEQUENCES])
     }
 }
 
@@ -78,51 +81,24 @@ impl LookupTable {
         Self::default()
     }
 
-    pub fn command(&mut self, cmd: SequenceCommand) -> LutSeq {
-        // Two bytes per instruction, and eight instructions
-        // in a sequence.
-        const INDEX_TO_BYTE_OFFSET: usize = 8 * 2;
-        let start = (cmd as usize) * INDEX_TO_BYTE_OFFSET;
-        let end = start + INDEX_TO_BYTE_OFFSET;
-        LutSeq {
-            table: &mut self.0[start..end],
-        }
+    pub(crate) fn iter(&self) -> impl Iterator<Item = (&Sequence, Option<&'static str>)> {
+        self.0
+            .iter()
+            .enumerate()
+            .map(|(idx, instr)| (instr, SequenceCommand::command_index_name(idx)))
     }
 }
 
-impl Deref for LookupTable {
-    type Target = [u8];
+impl Index<SequenceCommand> for LookupTable {
+    type Output = Sequence;
 
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    fn index(&self, cmd: SequenceCommand) -> &Sequence {
+        &self.0[cmd as usize]
     }
 }
 
-impl AsRef<[u8]> for LookupTable {
-    fn as_ref(&self) -> &[u8] {
-        &self.0
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    /// Show that the sequence commands index into the correct
-    /// place in the u8 array
-    #[test]
-    fn sequence_command_offset() {
-        let mut lut = LookupTable::new();
-        lut.command(SequenceCommand::ChipErase).set(Sequence([
-            Instr::new(opcodes::sdr::CMD, Pads::Two, 0xDE),
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-        ]));
-        assert_eq!(lut[11 * 16], 0xDE);
+impl IndexMut<SequenceCommand> for LookupTable {
+    fn index_mut(&mut self, cmd: SequenceCommand) -> &mut Sequence {
+        &mut self.0[cmd as usize]
     }
 }

@@ -7,7 +7,7 @@ use super::lookup::LookupTable;
 use crate::fcb;
 
 /// Builder for a firmware configuration block
-/// definition
+/// that configures reads from serial flash.
 ///
 /// See the documentation on the types for more information.
 pub struct Builder {
@@ -38,6 +38,9 @@ impl Builder {
     /// ends up writing a field to a reserved offset in the FCB.
     pub fn build(self) -> Result<fcb::FCB, Box<dyn std::error::Error>> {
         let mut fcb = fcb::FCB::new();
+
+        self.serialze_lookup(&mut fcb);
+
         fcb.field_comment(
             0x00C,
             &(self.read_sample_clock_source as u8).to_le_bytes(),
@@ -118,15 +121,7 @@ impl Builder {
         // TODO dataValidTime
         // TODO busyOffset
         // TODO busyBitPolarity
-
-        const LOOKUP_TABLE_OFFSET: usize = 0x080;
-        for (idx, byte) in self.lookup_table.iter().enumerate() {
-            fcb.field_comment(
-                LOOKUP_TABLE_OFFSET + idx,
-                &[*byte],
-                format!("lookupTable[{}]", idx,),
-            );
-        }
+        
         match self.device_type {
             DeviceType::SerialNOR(norcb) => {
                 fcb.field_comment(0x1C0, &norcb.page_size, "pageSize");
@@ -139,5 +134,23 @@ impl Builder {
             }
         }
         Ok(fcb)
+    }
+
+    fn serialze_lookup(&self, fcb: &mut fcb::FCB) {
+        const LOOKUP_TABLE_OFFSET: usize = 0x080;
+        let mut offset = 0;
+        for (seq, cmd) in self.lookup_table.iter() {
+            let cmd_name: String = cmd.map(|cmd_name| format!("{}: ", cmd_name)).unwrap_or_default();
+
+            for instr in seq.0.iter() {
+                let raw = instr.raw();
+                fcb.field_comment(
+                    LOOKUP_TABLE_OFFSET + offset,
+                    &raw,
+                    format!("{}{} (RAW: {:?})", cmd_name, instr, instr),
+                );
+                offset += raw.len();
+            }
+        }
     }
 }
