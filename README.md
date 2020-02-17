@@ -8,7 +8,7 @@ Generate iMXRT data structures that are required for booting.
 
 ## Rationale
 
-This crate lets you define the FCB in Rust. FCBs are typically written by hand. If you're defining a FCB in C, you can use structs and macros to define the FCB layout and values. The approach, however, isn't great for catching invalid values at compile time. This crate takes a different, more radical approach, by using Rust to generate the structures at compile time.
+This crate lets you define iMXRT data structures that are required to boot, like FCBs. FCBs are typically written by hand. If you're defining a FCB in C, you can use structs and macros to define the FCB layout and values. The approach, however, isn't great for catching invalid values at compile time. This crate takes a different, more radical approach, by using Rust to generate the data structures at compile time.
 
 `imxrt-boot-gen` provides an API for FCB generation. Use it in another crate's `build.rs` to define the FCB, and write it to a file:
 
@@ -80,4 +80,4 @@ imxrt-boot-gen = { features = ["imxrt1062"] }
 
 ## Examples
 
-See the [`teensy4-fcb` crate](https://crates.io/crates/teensy4-fcb) for an example of how to use the `imxrt-boot-gen` crate.
+See the [`teensy4-fcb` crate](https://crates.io/crates/teensy4-fcb) for an example of how to use the `imxrt-boot-gen` crate. The `teensy4-rs` project uses this crate to generate the FlexSPI firmware configuration block.
