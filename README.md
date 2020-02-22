@@ -13,15 +13,15 @@ This crate lets you define iMXRT data structures that are required to boot, like
 `imxrt-boot-gen` provides an API for FCB generation. Use it in another crate's `build.rs` to define the FCB, and write it to a file:
 
 ```rust
-let builder = Builder {
-    read_sample_clock_source: ReadSampleClockSource::LoopbackFromDQSPad,
-    cs_hold_time: CSHoldTime::new(0x01),
-    cs_setup_time: CSSetupTime::new(0x02),
-    column_address_width: ColumnAddressWidth::other_devices(),
-    device_mode_configuration: DeviceModeConfiguration::Disabled,
-    // Other members...
-};
-let fcb = builder.build().unwrap();
+let fcb = FCBBuilder::new(DeviceType::SerialNOR(nor_cb), lookup_table)
+        .read_sample_clk_src(ReadSampleClockSource::LoopbackFromDQSPad)
+        .cs_hold_time(0x01)
+        .cs_setup_time(0x02)
+        .column_address_width(ColumnAddressWidth::OtherDevices)
+        .device_mode_configuration(DeviceModeConfiguration::Disabled)
+        // Other fields...
+        .build()
+        .unwrap();
 let out_dir = env::var("OUT_DIR").unwrap();
 let dest_path = Path::new(&out_dir).join("fcb.rs");
 let mut f = File::create(&dest_path).unwrap();
