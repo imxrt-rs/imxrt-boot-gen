@@ -3,11 +3,11 @@
 //! The module implements and documents the common FCB fields.
 
 use std::convert::TryFrom;
-use std::marker::PhantomData;
+use std::ops::{Index, IndexMut};
 use std::time::Duration;
 
 /// `readSampleClkSrc` of the general FCB   
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(u8)]
 pub enum ReadSampleClockSource {
     InternalLoopback = 0x00,
@@ -15,74 +15,28 @@ pub enum ReadSampleClockSource {
     FlashProvidedDQS = 0x03,
 }
 
-/// Serial flash CS hold time
-///
-/// Defaults to `0x03`, the 'recommended value'
-pub struct CSHoldTime([u8; 1]);
-
-impl CSHoldTime {
-    /// Specify a hold time
-    pub fn new(hold_time: u8) -> Self {
-        CSHoldTime([hold_time])
-    }
+/// `columnAdressWidth`
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(u8)]
+pub enum ColumnAddressWidth {
+    OtherDevices = 0,
+    Hyperflash = 3,
 }
 
-impl Default for CSHoldTime {
-    fn default() -> Self {
-        CSHoldTime([0x03])
-    }
-}
-
-as_ref_bytes_newtype!(CSHoldTime);
-
-/// Serial flash CS setup time
-///
-/// Defaults to `0x03`, the 'recommended value'
-pub struct CSSetupTime([u8; 1]);
-
-impl CSSetupTime {
-    /// Specify a setup time
-    pub fn new(setup_time: u8) -> Self {
-        CSSetupTime([setup_time])
-    }
-}
-
-impl Default for CSSetupTime {
-    fn default() -> Self {
-        CSSetupTime([0x03])
-    }
-}
-
-as_ref_bytes_newtype!(CSSetupTime);
-
-/// Column address width
-pub struct ColumnAddressWidth([u8; 1]);
-impl ColumnAddressWidth {
-    /// Returns the value that represents 'other devices'
-    pub fn other_devices() -> Self {
-        ColumnAddressWidth([0])
-    }
-
-    /// Returns the value that represents 'HyperFlash' devices
-    pub fn hyper_flash() -> Self {
-        ColumnAddressWidth([3])
-    }
-}
-
-as_ref_bytes_newtype!(ColumnAddressWidth);
-
-/// `deviceModeArg`, only useful when paired
-/// with `DeviceModeConfiguration`.
+/// Sequence parameter for device mode configuration
 #[derive(Default, Clone, Copy, PartialEq, Eq)]
-pub struct DeviceModeArgument([u8; 4]);
-
-impl DeviceModeArgument {
-    pub fn new(argument: u32) -> Self {
-        Self(argument.to_le_bytes())
+pub struct DeviceModeSequence(pub(crate) [u8; 4]);
+impl DeviceModeSequence {
+    /// Create a new sequence parameter for device configuration
+    ///
+    /// `starting_lut_index`: starting LUT index of Device mode configuration command
+    /// `number_of_luts`: number of LUT sequences for Device mode configuration command
+    pub fn new(number_of_luts: u8, starting_lut_index: u8) -> Self {
+        DeviceModeSequence(
+            ((u32::from(starting_lut_index) << 8) | u32::from(number_of_luts)).to_le_bytes(),
+        )
     }
 }
-
-as_ref_bytes_newtype!(DeviceModeArgument);
 
 /// Describes both the `deviceModeCfgEnable` field, and
 /// the `deviceModeArg` field, which is only valid if
@@ -93,8 +47,13 @@ pub enum DeviceModeConfiguration {
     Disabled,
     /// Device configuration mode is enabled
     ///
-    /// Tells the processor to use the associated `DeviceModeArgument`
-    Enabled(DeviceModeArgument),
+    /// Tells the processor to use the associated device mode argument and sequence
+    Enabled {
+        /// `deviceModeArg`
+        device_mode_arg: u32,
+        /// `deviceModeSeq`
+        device_mode_seq: DeviceModeSequence,
+    },
 }
 
 impl Default for DeviceModeConfiguration {
@@ -111,10 +70,11 @@ impl Default for DeviceModeConfiguration {
 /// > If it is greater than 0, ROM will wait waitTimeCfgCommands * 100us
 /// > for all device memory configuration commands instead of using read
 /// > status to wait until these commands complete.
-pub struct WaitTimeConfigurationCommands([u8; 2]);
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WaitTimeConfigurationCommands(pub(crate) u16);
 impl WaitTimeConfigurationCommands {
     pub fn disable() -> Self {
-        WaitTimeConfigurationCommands([0, 0])
+        WaitTimeConfigurationCommands(0)
     }
 
     /// Computes the wait time from the specified `wait_time`. The
@@ -128,44 +88,22 @@ impl WaitTimeConfigurationCommands {
             None
         } else {
             let factor = u16::try_from(us / 100).ok()?;
-            Some(WaitTimeConfigurationCommands(factor.to_le_bytes()))
+            Some(WaitTimeConfigurationCommands(factor))
         }
     }
 }
-
-as_ref_bytes_newtype!(WaitTimeConfigurationCommands);
-
-/// Sequence parameter for device mode configuration
-#[derive(Default)]
-pub struct DeviceModeSequence([u8; 4]);
-impl DeviceModeSequence {
-    /// Create a new sequence parameter for device configuration
-    ///
-    /// `starting_lut_index`: starting LUT index of Device mode configuration command
-    /// `number_of_luts`: number of LUT sequences for Device mode configuration command
-    pub fn new(number_of_luts: u8, starting_lut_index: u8) -> Self {
-        DeviceModeSequence(
-            ((u32::from(starting_lut_index) << 8) | u32::from(number_of_luts)).to_le_bytes(),
-        )
-    }
-}
-
-as_ref_bytes_newtype!(DeviceModeSequence);
-
-// TODO confCmdEnable
-// TODO configCmdSeqs
-// TODO cfgCmdArgs
-// TODO controllerMiscOption
 
 /// Describes the `deviceType` field.
 ///
 /// Only the SerialNOR is implemented; `DeviceType`
 /// may also have `SerialNAND` in the future.
+#[derive(Debug, Clone, Copy)]
 pub enum DeviceType {
     SerialNOR(super::nor::ConfigurationBlock),
 }
 
 /// `sFlashPad` field
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum FlashPadType {
     Single = 1,
@@ -175,6 +113,7 @@ pub enum FlashPadType {
 }
 
 /// `serialClkFreq`
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum SerialClockFrequency {
     MHz30 = 1,
@@ -189,50 +128,33 @@ pub enum SerialClockFrequency {
     MHz166 = 9,
 }
 
-// TODO lutCustomSeqEnable
-
-/// Type tag for `SerialFlashSize`
-pub struct A1;
-/// Type tag for `SerialFlashSize`
-pub struct A2;
-/// Type tag for `SerialFlashSize`
-pub struct B1;
-/// Type tag for `SerialFlashSize`
-pub struct B2;
-
-/// `sFlashXXSize` field, where `XX` is one of `A1`,
-/// `A2`, `B1`, `B2`.
-///
-/// If we're using SPI NAND, the size wrapped
-/// in this value will be multiplied by `2`.
-pub struct SerialFlashSize<Region> {
-    _region: PhantomData<Region>,
-    pub(crate) size: u32,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(usize)]
+pub enum SerialFlashRegion {
+    A1,
+    A2,
+    B1,
+    B2,
 }
 
-impl<Region> SerialFlashSize<Region> {
-    /// The `actual_size` will be multiplied by `2` in
-    /// the final output if we're also using SPI NAND.
-    pub fn new(actual_size: u32) -> Self {
-        SerialFlashSize {
-            _region: PhantomData,
-            size: actual_size,
-        }
+#[derive(Debug, Clone, Copy, Default)]
+pub(crate) struct SerialFlashSize(pub(crate) [u32; 4]);
+
+impl Index<SerialFlashRegion> for SerialFlashSize {
+    type Output = u32;
+    fn index(&self, region: SerialFlashRegion) -> &u32 {
+        &self.0[region as usize]
     }
 }
 
-impl<Region> Default for SerialFlashSize<Region> {
-    fn default() -> Self {
-        Self::new(0)
+impl IndexMut<SerialFlashRegion> for SerialFlashSize {
+    fn index_mut(&mut self, region: SerialFlashRegion) -> &mut u32 {
+        &mut self.0[region as usize]
     }
 }
 
-// TODO csPadSettingOverride
-// TODO sclkPadSettingOverride
-// TODO dataPadSettingOverride
-// TODO dqsPadSettingOverride
-// TODO timeoutInMs
-// TODO commandInverval
-// TODO dataValidTime
-// TODO busyOffset
-// TODO busyBitPolarity
+impl SerialFlashSize {
+    pub(crate) fn new() -> Self {
+        SerialFlashSize::default()
+    }
+}

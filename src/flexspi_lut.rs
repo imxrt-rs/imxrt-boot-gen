@@ -8,6 +8,11 @@ use std::fmt;
 pub(crate) const INSTRUCTION_SIZE: usize = 2;
 
 /// A FlexSPI instruction
+///
+/// An `Instr` has an opcode, a pad count, and an opcode-dependent operand.
+/// Opcodes are available in the [`opcode` module](opcodes/index.html).
+///
+/// `Instr`s are used to create FlexSPI lookup table command [`Sequence`s](struct.Sequence.html).
 #[derive(Clone, Copy)]
 pub struct Instr {
     /// Raw instructions
@@ -18,6 +23,10 @@ pub struct Instr {
 
 impl Instr {
     /// Create a new FlexSPI LUT instruction
+    ///
+    /// Note that the `JUMP_ON_CS` and `STOP` opcodes are not available. However,
+    /// there are pre-defined [`JUMP_ON_CS`](constant.JUMP_ON_CS.html) and [`STOP`](constant.STOP.html)
+    /// instructions which you should use.
     pub const fn new(opcode: Opcode, pads: Pads, operand: u8) -> Self {
         Instr {
             // Little endian
@@ -70,14 +79,43 @@ impl fmt::Debug for Instr {
     }
 }
 
-/// STOP instruction
+/// STOP FlexSPI instruction
 pub const STOP: Instr = Instr::stop();
-/// JUMP_ON_CS instruction
+/// JUMP_ON_CS FlexSPI instruction
 pub const JUMP_ON_CS: Instr = Instr::jump_on_cs();
 
 pub(crate) const INSTRUCTIONS_PER_SEQUENCE: usize = 8;
 
 /// A collection of FlexSPI LUT instructions
+///
+/// Each `Sequence` may have up to eight instructions. Any unused instructions must
+/// be inlined to [`STOP`](constant.STOP.html). The sequences you'll require are dependent
+/// on the specific flash memory that you're interacting with.
+///
+/// `Sequence`s are used to create a [`LookupTable`](../serial_flash/lookup/struct.LookupTable.html).
+///
+/// # Example
+///
+/// ```
+/// use imxrt_boot_gen::serial_flash::{
+///     Sequence,
+///     Instr,
+///     STOP,
+///     Pads,
+///     opcodes::sdr::*,
+/// };
+///
+/// const SEQ_READ: Sequence = Sequence([
+///     Instr::new(CMD, Pads::One, 0xEB),
+///     Instr::new(READ, Pads::Four, 0x04),
+///     STOP,
+///     STOP,
+///     STOP,
+///     STOP,
+///     STOP,
+///     STOP,
+/// ]);
+/// ```
 #[derive(Clone, Copy)]
 pub struct Sequence(pub [Instr; INSTRUCTIONS_PER_SEQUENCE]);
 pub(crate) const SEQUENCE_SIZE: usize = INSTRUCTIONS_PER_SEQUENCE * INSTRUCTION_SIZE;
@@ -133,7 +171,7 @@ impl fmt::Debug for Pads {
     }
 }
 
-/// LUT instruction opcodes
+/// FlexSPI lookup table instruction opcodes
 ///
 /// Opcodes are separated by their data transfer rates. General opcodes
 /// are in the top-level `opcodes` module.
@@ -198,7 +236,7 @@ pub mod opcodes {
 
     /// Dual data transfer rate (DDR) opcodes
     ///
-    /// See the documentation on the corresponding `ssr` opcode
+    /// See the documentation on the corresponding [`ssr` opcode](../sdr/index.html)
     /// for more information.
     pub mod ddr {
         use super::sdr;

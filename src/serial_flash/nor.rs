@@ -1,29 +1,9 @@
 //! Fields specific for NOR flash
 
-/// `pageSize` field a serial NOR-specific FCB
-pub struct PageSize([u8; 4]);
-/// `sectorSize` field a serial NOR-specific FCB
-pub struct SectorSize([u8; 4]);
-
-impl PageSize {
-    pub fn new(page_size: u32) -> Self {
-        PageSize(page_size.to_le_bytes())
-    }
-}
-
-as_ref_bytes_newtype!(PageSize);
-
-impl SectorSize {
-    pub fn new(sector_size: u32) -> Self {
-        SectorSize(sector_size.to_le_bytes())
-    }
-}
-
-as_ref_bytes_newtype!(SectorSize);
-
 /// `ipCmdSerialClkFreq` field for serial NOR-specific FCB
 ///
 /// Chip specific value, not used by ROM
+#[derive(Debug, Clone, Copy)]
 #[repr(u8)]
 pub enum SerialClockFrequency {
     /// No change, keep current serial clock unchanged
@@ -45,8 +25,9 @@ pub enum SerialClockFrequency {
 }
 
 /// The fields specific for defining a serial NOR FCB
+#[derive(Debug, Clone, Copy)]
 pub struct ConfigurationBlock {
-    pub page_size: PageSize,
-    pub sector_size: SectorSize,
+    pub page_size: u32,
+    pub sector_size: u32,
     pub ip_cmd_serial_clk_freq: SerialClockFrequency,
 }

@@ -9,6 +9,7 @@ pub use crate::flexspi_lut::*;
 /// `CommandSequence`s are looked up by the processor when it needs to
 /// interact with the flash chip. The enumeration lets us index back into
 /// the `Lookup` struct, and associate a sequence command for that action.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(usize)]
 pub enum CommandSequence {
     Read = 0,
@@ -45,7 +46,7 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 /// `LookupTable` is a fixed-sized byte array. We provide convenience
 /// methods for inserting command sequences into the table. The contents
 /// of sequences are based on the FLASH chip that we're talking to. Refer
-/// to your FLASH chip's refence manual.
+/// to your flash memory's refence manual.
 ///
 /// ```
 /// use imxrt_boot_gen::serial_flash::{

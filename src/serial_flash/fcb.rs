@@ -99,18 +99,8 @@ impl FCB {
         self.field(offset, bytes);
         self.comments[offset] = comment.to_string();
     }
-}
 
-impl AsRef<[u8]> for FCB {
-    fn as_ref(&self) -> &[u8] {
-        &self.raw
-    }
-}
-
-impl std::ops::Deref for FCB {
-    type Target = [u8];
-
-    fn deref(&self) -> &[u8] {
+    pub fn as_bytes(&self) -> &[u8] {
         &self.raw
     }
 }
