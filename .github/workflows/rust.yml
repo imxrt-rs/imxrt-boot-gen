@@ -16,3 +16,19 @@ jobs:
       run: cargo build --verbose --features ${{ matrix.feature }}
     - name: Run tests (${{ matrix.feature }})
       run: cargo test --verbose --features ${{ matrix.feature }}
+  
+  clippy_check:
+    strategy:
+      matrix:
+        feature: ["imxrt1011", "imxrt1062"] # Using a iMXRT family subset, assuming the 106x chips have the same features
+      
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - run: rustup component add clippy
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --features ${{ matrix.feature }}
+          name: Run clippy (${{ matrix.feature }})
