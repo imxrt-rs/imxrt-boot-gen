@@ -1,6 +1,6 @@
 name: All Checks
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
     - name: Run tests (${{ matrix.feature }})
       run: cargo test --verbose --features ${{ matrix.feature }}
   
-  clippy_check:
+  clippy:
     strategy:
       matrix:
         feature: ["imxrt1011", "imxrt1062"] # Using a iMXRT family subset, assuming the 106x chips have the same features
@@ -30,5 +30,13 @@ jobs:
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          args: --features ${{ matrix.feature }}
+          args: --features ${{ matrix.feature }} -- -D warnings
           name: Run clippy (${{ matrix.feature }})
+
+  format:
+    steps:
+      - name: Run cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
