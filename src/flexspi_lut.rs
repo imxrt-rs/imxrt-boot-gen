@@ -28,6 +28,8 @@ impl Instr {
     /// there are pre-defined [`JUMP_ON_CS`](constant.JUMP_ON_CS.html) and [`STOP`](constant.STOP.html)
     /// instructions which you should use.
     pub const fn new(opcode: Opcode, pads: Pads, operand: u8) -> Self {
+        let x: 
+            i32;
         Instr {
             // Little endian
             raw: [operand, (opcode.0 << 2) | (pads as u8)],
