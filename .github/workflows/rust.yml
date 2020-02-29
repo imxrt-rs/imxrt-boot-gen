@@ -4,8 +4,9 @@ on: [push]
 
 jobs:
   build:
-    matrix:
-      feature: ["imxrt1011", "imxrt1061", "imxrt1062", "imxrt1064"]
+    strategy:
+      matrix:
+        feature: ["imxrt1011", "imxrt1061", "imxrt1062", "imxrt1064"]
 
     runs-on: ubuntu-latest
 
