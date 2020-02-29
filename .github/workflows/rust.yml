@@ -1,0 +1,17 @@
+name: All Checks
+
+on: [push]
+
+jobs:
+  build:
+    matrix:
+      feature: ["imxrt1011", "imxrt1061", "imxrt1062", "imxrt1064"]
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build (${{ matrix.feature }})
+      run: cargo build --verbose --features ${{ matrix.feature }}
+    - name: Run tests (${{ matrix.feature }})
+      run: cargo test --verbose --features ${{ matrix.feature }}
