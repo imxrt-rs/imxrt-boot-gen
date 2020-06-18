@@ -110,7 +110,7 @@ impl fmt::Display for FCB {
         writeln!(
             f,
             r#"
-#[link_section = ".fcb"]
+#[cfg_attr(target_arch = "arm", link_section = ".fcb")]
 #[no_mangle]
 pub static FLEXSPI_CONFIGURATION_BLOCK: [u8; 512] = ["#,
         )?;

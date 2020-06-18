@@ -137,8 +137,9 @@
 //! # ABI
 //!
 //! The output is a single, 512-byte `u8` array, called `FLEXSPI_CONFIGURATION_BLOCK`.
-//! The name is not mangled. It may be referenced in a linker script by its section,
-//! `".fcb"`. Given the ABI guarantees, the FCB should be usable from both Rust and C.
+//! The name is not mangled. When building for ARM platforms, it may be referenced
+//! in a linker script by its section, `".fcb"`. Given the ABI guarantees, the FCB
+//! should be usable from both Rust and C.
 
 mod flexspi_lut;
 pub mod serial_flash;

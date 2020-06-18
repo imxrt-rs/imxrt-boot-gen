@@ -37,7 +37,7 @@ include!(concat!(env!("OUT_DIR"), "/fcb.rs"));
 Your crate now exports a FCB that resembles
 
 ```rust
-#[link_section = ".fcb"]
+#[cfg_attr(target_arch = "arm", link_section = ".fcb")]
 #[no_mangle]
 pub static FLEXSPI_CONFIGURATION_BLOCK: [u8; 512] = [
     0x46, // 0x000 Tag 'FCFB'
@@ -56,7 +56,7 @@ You may now link that crate into another executable. Make sure that you place th
 
 ## ABI
 
-The generated FCB has the symbol `FLEXSPI_CONFIGURATION_BLOCK`. The symbol is not mangled. The memory is an array of 512 `u8`s. It has a link section of `".fcb"`. The ABI ensures compatibility with both Rust and C. By building a C static library from your Rust crate, you can link the FCB into other C applications that target the iMXRT processor family.
+The generated FCB has the symbol `FLEXSPI_CONFIGURATION_BLOCK`. The symbol is not mangled. The memory is an array of 512 `u8`s. It has a link section of `".fcb"` when built for ARM systems. The ABI ensures compatibility with both Rust and C. By building a C static library from your Rust crate, you can link the FCB into other C applications that target the iMXRT processor family.
 
 ## Supported Processors
 
