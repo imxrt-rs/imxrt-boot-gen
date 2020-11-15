@@ -133,6 +133,61 @@ impl fmt::Display for Sequence {
     }
 }
 
+/// A compile-time [`Sequence`] builder
+///
+/// Use `SequenceBuilder` to define a FlexSPI LUT sequence. If you insert too many instructions
+/// into the sequence, you'll observe a compile-time error.
+///
+/// Any unspecified instructions are set to [`STOP`].
+///
+/// # Example
+///
+/// ```
+/// use imxrt_boot_gen::serial_flash::{
+///     Sequence,
+///     SequenceBuilder,
+///     Instr,
+///     Pads,
+///     opcodes::sdr::*,
+/// };
+///
+/// const SEQ_READ: Sequence = SequenceBuilder::new()
+///     .instr(Instr::new(CMD, Pads::One, 0xEB))
+///     .instr(Instr::new(READ, Pads::Four, 0x04))
+///     .build();
+/// ```
+pub struct SequenceBuilder {
+    sequence: Sequence,
+    offset: usize,
+}
+
+impl SequenceBuilder {
+    /// Creates a new `SequenceBuilder` than can accept up to eight instructions
+    ///
+    /// All unspecified instructions are set to [`STOP`].
+    pub const fn new() -> Self {
+        SequenceBuilder {
+            sequence: Sequence::stopped(),
+            offset: 0,
+        }
+    }
+    /// Insert `instr` as the next sequence instruction
+    ///
+    /// If you call `instr` more than 8 times, you'll observe a compile-time error.
+    pub const fn instr(self, instr: Instr) -> Self {
+        let mut seq = self.sequence.0;
+        seq[self.offset] = instr;
+        SequenceBuilder {
+            sequence: Sequence(seq),
+            offset: self.offset + 1,
+        }
+    }
+    /// Create the sequence
+    pub const fn build(self) -> Sequence {
+        self.sequence
+    }
+}
+
 /// A FlexSPI opcode
 ///
 /// Available `Opcode`s are defined in the `opcodes` module.
@@ -316,8 +371,8 @@ mod test {
     use super::opcodes::sdr::*;
     use super::Instr;
     use super::Pads;
-    use super::Sequence;
     use super::STOP;
+    use super::{Sequence, SequenceBuilder};
 
     fn seq_to_bytes(seq: Sequence) -> Vec<u8> {
         let mut buffer = vec![0; super::SEQUENCE_SIZE];
@@ -355,6 +410,22 @@ mod test {
     }
 
     #[test]
+    fn teensy4_read_builder() {
+        const EXPECTED: [u8; super::SEQUENCE_SIZE] = [
+            0xEB, 0x04, 0x18, 0x0A, 0x06, 0x32, 0x04, 0x26, 0, 0, 0, 0, 0, 0, 0, 0,
+        ];
+
+        const SEQUENCE: Sequence = SequenceBuilder::new()
+            .instr(Instr::new(CMD, Pads::One, 0xEB))
+            .instr(Instr::new(RADDR, Pads::Four, 0x18))
+            .instr(Instr::new(DUMMY, Pads::Four, 0x06))
+            .instr(Instr::new(READ, Pads::Four, 0x04))
+            .build();
+
+        assert_eq!(&seq_to_bytes(SEQUENCE), &EXPECTED);
+    }
+
+    #[test]
     fn teensy4_read_status() {
         const EXPECTED: [u8; 4] = [0x05, 0x04, 0x04, 0x24];
         const SEQUENCE: Sequence = Sequence([
@@ -367,6 +438,16 @@ mod test {
             STOP,
             STOP,
         ]);
+        assert_eq!(&seq_to_bytes(SEQUENCE)[0..4], &EXPECTED);
+    }
+
+    #[test]
+    fn teensy4_read_status_builder() {
+        const EXPECTED: [u8; 4] = [0x05, 0x04, 0x04, 0x24];
+        const SEQUENCE: Sequence = SequenceBuilder::new()
+            .instr(Instr::new(CMD, Pads::One, 0x05))
+            .instr(Instr::new(READ, Pads::One, 0x04))
+            .build();
         assert_eq!(&seq_to_bytes(SEQUENCE)[0..4], &EXPECTED);
     }
 
@@ -434,3 +515,45 @@ mod test {
         assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(SEQUENCE)[..]);
     }
 }
+
+//
+// Keep these two tests in sync
+//
+// The first one lets you know if the second one is failing to compile
+// in the way we expect.
+//
+
+/// ```
+/// use imxrt_boot_gen::serial_flash::{*, opcodes::sdr::*};
+/// const INSTR: Instr = Instr::new(RADDR, Pads::Four, 0x18);
+/// const OUT_OF_BOUNDS: Sequence = SequenceBuilder::new()
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .build();
+/// ```
+#[cfg(doctest)]
+struct SequenceBuilderInstructionLimit;
+
+/// ```compile_fail
+/// use imxrt_boot_gen::serial_flash::{*, opcodes::sdr::*};
+/// const INSTR: Instr = Instr::new(RADDR, Pads::Four, 0x18);
+/// const OUT_OF_BOUNDS: Sequence = SequenceBuilder::new()
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR)
+///     .instr(INSTR) // <------- THIS SHOULD FAIL
+///     .build();
+/// ```
+#[cfg(doctest)]
+struct SequenceBuilderTooManyInstructions;
