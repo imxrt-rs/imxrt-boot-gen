@@ -340,7 +340,7 @@ mod test {
             0xEB, 0x04, 0x18, 0x0A, 0x06, 0x32, 0x04, 0x26, 0, 0, 0, 0, 0, 0, 0, 0,
         ];
 
-        let seq = Sequence([
+        const SEQUENCE: Sequence = Sequence([
             Instr::new(CMD, Pads::One, 0xEB),
             Instr::new(RADDR, Pads::Four, 0x18),
             Instr::new(DUMMY, Pads::Four, 0x06),
@@ -351,13 +351,13 @@ mod test {
             STOP,
         ]);
 
-        assert_eq!(&seq_to_bytes(seq), &EXPECTED);
+        assert_eq!(&seq_to_bytes(SEQUENCE), &EXPECTED);
     }
 
     #[test]
     fn teensy4_read_status() {
         const EXPECTED: [u8; 4] = [0x05, 0x04, 0x04, 0x24];
-        let seq = Sequence([
+        const SEQUENCE: Sequence = Sequence([
             Instr::new(CMD, Pads::One, 0x05),
             Instr::new(READ, Pads::One, 0x04),
             STOP,
@@ -367,13 +367,13 @@ mod test {
             STOP,
             STOP,
         ]);
-        assert_eq!(&seq_to_bytes(seq)[0..4], &EXPECTED);
+        assert_eq!(&seq_to_bytes(SEQUENCE)[0..4], &EXPECTED);
     }
 
     #[test]
     fn teensy4_write_enable() {
         const EXPECTED: u128 = 0x0000_0406;
-        let seq = Sequence([
+        const SEQUENCE: Sequence = Sequence([
             Instr::new(CMD, Pads::One, 0x06),
             STOP,
             STOP,
@@ -383,13 +383,13 @@ mod test {
             STOP,
             STOP,
         ]);
-        assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(seq)[..]);
+        assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(SEQUENCE)[..]);
     }
 
     #[test]
     fn teensy4_erase_sector() {
         const EXPECTED: u128 = 0x0818_0420;
-        let seq = Sequence([
+        const SEQUENCE: Sequence = Sequence([
             Instr::new(CMD, Pads::One, 0x20),
             Instr::new(RADDR, Pads::One, 0x18),
             STOP,
@@ -399,13 +399,13 @@ mod test {
             STOP,
             STOP,
         ]);
-        assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(seq)[..]);
+        assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(SEQUENCE)[..]);
     }
 
     #[test]
     fn teensy4_page_program() {
         const EXPECTED: u128 = 0x0000_2004_0818_0402;
-        let seq = Sequence([
+        const SEQUENCE: Sequence = Sequence([
             Instr::new(CMD, Pads::One, 0x02),
             Instr::new(RADDR, Pads::One, 0x18),
             Instr::new(WRITE, Pads::One, 0x04),
@@ -415,13 +415,13 @@ mod test {
             STOP,
             STOP,
         ]);
-        assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(seq)[..]);
+        assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(SEQUENCE)[..]);
     }
 
     #[test]
     fn teensy4_chip_erase() {
         const EXPECTED: u128 = 0x0000_0460;
-        let seq = Sequence([
+        const SEQUENCE: Sequence = Sequence([
             Instr::new(CMD, Pads::One, 0x60),
             STOP,
             STOP,
@@ -431,6 +431,6 @@ mod test {
             STOP,
             STOP,
         ]);
-        assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(seq)[..]);
+        assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(SEQUENCE)[..]);
     }
 }
