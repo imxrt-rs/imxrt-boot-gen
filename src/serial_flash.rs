@@ -193,7 +193,7 @@ impl FlexSPIConfigurationBlock {
             data_valid_time: 0,
             busy_offset: 0,
             busy_bit_polarity: 0,
-            lookup_table: lookup_table,
+            lookup_table,
             lut_custom_seq: [0; 48],
 
             _reserved0: [0; 4],
