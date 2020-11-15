@@ -50,13 +50,13 @@ pub const JUMP_ON_CS: Instr = Instr::jump_on_cs();
 
 pub(crate) const INSTRUCTIONS_PER_SEQUENCE: usize = 8;
 
-/// A collection of FlexSPI LUT instructions
+/// A collection of FlexSPI instructions
 ///
 /// Each `Sequence` may have up to eight instructions. Use [`SequenceBuilder`] to create
 /// a `Sequence`. The sequences you'll require are dependent on the specific flash memory that
 /// you're interacting with.
 ///
-/// `Sequence`s are used to create a [`LookupTable`](../serial_flash/lookup/struct.LookupTable.html).
+/// `Sequence`s are used to create a [`LookupTable`].
 #[derive(Clone, Copy, Debug)]
 #[repr(transparent)]
 pub struct Sequence(pub(crate) [Instr; INSTRUCTIONS_PER_SEQUENCE]);
@@ -68,7 +68,7 @@ impl Sequence {
     }
 }
 
-/// A compile-time [`Sequence`] builder
+/// A [`Sequence`] builder
 ///
 /// Use `SequenceBuilder` to define a FlexSPI LUT sequence. If you insert too many instructions
 /// into the sequence, you'll observe a compile-time error.

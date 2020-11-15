@@ -23,12 +23,12 @@ pub enum Command {
 const LOOKUP_TABLE_SIZE_BYTES: usize = 256;
 const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 
-/// The lookup table, part of the general FCB memory region.
+/// A sequence lookup table, part of the general FlexSPI configuration block
 ///
-/// `LookupTable` is a fixed-sized byte array. We provide convenience
-/// methods for inserting command sequences into the table. The contents
-/// of sequences are based on the FLASH chip that we're talking to. Refer
-/// to your flash memory's refence manual.
+/// The contents of the sequences depend on what kind of FLASH device we're
+/// interfacing. Refer to your FLASH device manual for more information.
+///
+/// Any unspecified command is set to a sequence of STOPs.
 ///
 /// ```
 /// use imxrt_boot_gen::serial_flash::{
@@ -38,14 +38,13 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 ///     Sequence, Instr,
 ///     opcodes::sdr::*,
 ///     Pads,
-///     STOP,
 /// };
 ///
-/// let mut lookup_table = LookupTable::new();
-/// lookup_table[Command::Read] = SequenceBuilder::new()
-///     .instr(Instr::new(CMD, Pads::One, 0xEB))
-///     .instr(Instr::new(RADDR, Pads::Four, 0x02))
-///     .build();
+/// const LUT: LookupTable = LookupTable::new()
+///     .command(Command::Read, SequenceBuilder::new()
+///         .instr(Instr::new(CMD, Pads::One, 0xEB))
+///         .instr(Instr::new(RADDR, Pads::Four, 0x02))
+///         .build());
 /// ```
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]

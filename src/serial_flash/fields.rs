@@ -21,6 +21,7 @@ pub enum ColumnAddressWidth {
 
 /// Sequence parameter for device mode configuration
 #[derive(Default, Clone, Copy, PartialEq, Eq)]
+#[repr(transparent)]
 pub struct DeviceModeSequence(pub(crate) [u8; 4]);
 impl DeviceModeSequence {
     /// Create a new sequence parameter for device configuration
@@ -117,6 +118,7 @@ pub enum SerialClockFrequency {
     MHz166 = 9,
 }
 
+/// A FlexSPI serial flash region
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(usize)]
 pub enum SerialFlashRegion {

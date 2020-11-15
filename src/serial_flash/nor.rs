@@ -1,4 +1,4 @@
-//! Fields specific for NOR flash
+//! Serial NOR configuration blocks and fields
 
 use super::FlexSPIConfigurationBlock;
 
@@ -26,7 +26,26 @@ pub enum SerialClockFrequency {
     MHz166 = 9,
 }
 
-/// The fields specific for defining a serial NOR FCB
+/// A serial NOR configuration block
+///
+/// This is the memory that you'll need to properly place in memory in order to
+/// boot your i.MX RT system. Consider keeping the symbol name, and specifying
+/// a link section, so that you can more easily place the memory in your linker
+/// script.
+///
+/// ```no_run
+/// use imxrt_boot_gen::serial_flash::nor;
+/// # use imxrt_boot_gen::serial_flash::{FlexSPIConfigurationBlock, LookupTable};
+///
+/// # const FLEXSPI_CONFIGURATION_BLOCK: FlexSPIConfigurationBlock = FlexSPIConfigurationBlock::new(LookupTable::new());
+/// #[no_mangle]
+/// #[link_section = ".serial_nor_cb"]
+/// static SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
+///     nor::ConfigurationBlock::new(FLEXSPI_CONFIGURATION_BLOCK)
+///         .page_size(256)
+///         .sector_size(4096)
+///         .ip_cmd_serial_clk_freq(nor::SerialClockFrequency::MHz30);
+/// ```
 #[derive(Debug, Clone, Copy)]
 #[repr(C, packed)]
 pub struct ConfigurationBlock {

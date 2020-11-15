@@ -1,9 +1,66 @@
-//! Serial NOR and NAND FLASH booting
+//! Serial NOR flash boot
 //!
-//! The types in `serial_flash` can help you define a FCB suitable for serial
-//! NOR- / NAND-flash booting.
+//! `serial_flash` provides the types necessary to boot an i.MX RT processor
+//! from serial NOR flash. *Note: NAND Flash boot not yet implemented.*
 //!
-//! Note: NAND Flash boot not yet implemented
+//! The API includes
+//!
+//! - Flexible Serial Peripheral Interface (FlexSPI) sequence and lookup table (LUT)
+//! - FlexSPI configuration block ([`FlexSPIConfigurationBlock`])
+//! - serial NOR configuration block ([`nor::ConfigurationBlock`]), which should be
+//!   properly placed in memory
+//!
+//! # Sequences and LUTs
+//!
+//! A [`Sequence`] is a collection of up to eight FlexSPI instructions ([`Instr`]).
+//! The FlexSPI controller sequentially executes instructions to perform reads, writes
+//! and I/O with a connected FLASH device. The FlexSPI controller finds each sequence
+//! in a [`LookupTable`].
+//!
+//! Use a [`SequenceBuilder`] to create `Sequence`s:
+//!
+//! ```
+//! use imxrt_boot_gen::serial_flash::{Instr, Sequence, SequenceBuilder, Pads, opcodes::sdr::*};
+//!
+//! # const FAST_READ_QUAD_IO: u8 = 0;
+//! # const READ_STATUS_REGISTER_1: u8 = 0;
+//! const SEQ_READ: Sequence = SequenceBuilder::new()
+//!     .instr(Instr::new(CMD, Pads::One, FAST_READ_QUAD_IO))
+//!     .instr(Instr::new(RADDR, Pads::Four, 0x18))
+//!     .instr(Instr::new(DUMMY, Pads::Four, 0x06))
+//!     .instr(Instr::new(READ, Pads::Four, 0x04))
+//!     .build();
+//!
+//! const SEQ_READ_STATUS: Sequence = SequenceBuilder::new()
+//!     .instr(Instr::new(CMD, Pads::One, READ_STATUS_REGISTER_1))
+//!     .instr(Instr::new(READ, Pads::One, 0x04))
+//!     .build();
+//! ```
+//!
+//! Then, assign each sequence to a [`Command`] in a `LookupTable`:
+//!
+//! ```
+//! use imxrt_boot_gen::serial_flash::{Command, LookupTable};
+//! # use imxrt_boot_gen::serial_flash::{Sequence, SequenceBuilder};
+//!
+//! # const SEQ_READ: Sequence = SequenceBuilder::new().build();
+//! # const SEQ_READ_STATUS: Sequence = SequenceBuilder::new().build();
+//! const LUT: LookupTable = LookupTable::new()
+//!     .command(Command::Read, SEQ_READ)
+//!     .command(Command::ReadStatus, SEQ_READ_STATUS);
+//! ```
+//!
+//! # FlexSPI Configuration Block
+//!
+//! Once you've created your sequences and lookup table, use the lookup table to create
+//! a [`FlexSPIConfigurationBlock`]. See the `FlexSPIConfigurationBlock` documentation
+//! for more information.
+//!
+//! # Serial NOR Configuration Block
+//!
+//! Finally, use the FlexSPI configuration block to create a Serial NOR configuration
+//! block. You are responsible for placing the serial NOR configuration block at the correct
+//! location in memory. See [`nor::ConfigurationBlock`] for an example.
 
 mod fields;
 mod lookup;
@@ -29,6 +86,37 @@ pub const RECOMMENDED_CS_HOLD_TIME: u8 = 0x03;
 /// This is the default value if not set with [`FlexSPIConfigurationBlock::cs_setup_time`].
 pub const RECOMMENDED_CS_SETUP_TIME: u8 = 0x03;
 
+/// FlexSPI configuration block
+///
+/// The FlexSPI configuration block consists of parameters that are for specific flash
+/// devices. The configuration block includes the FlexSPI [`LookupTable`]. The configuration
+/// block is shared between serial NOR and NAND configuration blocks.
+///
+/// # Default Values
+///
+/// - `cs_hold_time` is [`RECOMMENDED_CS_HOLD_TIME`]
+/// - `cs_setup_time` is [`RECOMMENDED_CS_SETUP_TIME`]
+///
+/// All other configurable values are set to a bit pattern of 0.
+///
+/// # Examples
+///
+/// ```
+/// use imxrt_boot_gen::serial_flash::*;
+///
+/// # const LUT: LookupTable = LookupTable::new();
+/// const FLEXSPI_CONFIGURATION_BLOCK: FlexSPIConfigurationBlock =
+///     FlexSPIConfigurationBlock::new(LUT)
+///         .read_sample_clk_src(ReadSampleClockSource::LoopbackFromDQSPad)
+///         .cs_hold_time(0x01)
+///         .cs_setup_time(0x02)
+///         .column_address_width(ColumnAddressWidth::OtherDevices)
+///         .device_mode_configuration(DeviceModeConfiguration::Disabled)
+///         .wait_time_cfg_commands(WaitTimeConfigurationCommands::new(40_000))
+///         .flash_size(SerialFlashRegion::A1, 0x0020_0000)
+///         .serial_clk_freq(SerialClockFrequency::MHz60)
+///         .serial_flash_pad_type(FlashPadType::Quad);
+///
 #[derive(Debug, Clone, Copy)]
 #[repr(C, packed)]
 pub struct FlexSPIConfigurationBlock {
@@ -73,6 +161,8 @@ pub struct FlexSPIConfigurationBlock {
 }
 
 impl FlexSPIConfigurationBlock {
+    /// Create a new configuration block that uses `lookup_table` as the
+    /// FlexSPI LUT
     pub const fn new(lookup_table: LookupTable) -> Self {
         FlexSPIConfigurationBlock {
             tag: TAG,
@@ -91,7 +181,7 @@ impl FlexSPIConfigurationBlock {
             controller_misc_options: 0,
             device_type: 0, // Invalid value; must be updated in NOR / NAND configuration block
             serial_flash_pad_type: 1, // Single pad
-            serial_clk_freq: 1, // 30MHz
+            serial_clk_freq: 0, // 30MHz
             lut_custom_seq_enable: 0,
             serial_flash_sizes: [0; 4],
             cs_pad_setting_override: 0,
@@ -212,23 +302,3 @@ impl FlexSPIConfigurationBlock {
 
 const _STATIC_ASSERT_SIZE: [u32; 1] =
     [0; (core::mem::size_of::<FlexSPIConfigurationBlock>() == 448) as usize];
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn smoke() {
-        const _FCB: FlexSPIConfigurationBlock =
-            FlexSPIConfigurationBlock::new(super::LookupTable::new())
-                .read_sample_clk_src(ReadSampleClockSource::LoopbackFromDQSPad)
-                .cs_hold_time(0x01)
-                .cs_setup_time(0x02)
-                .column_address_width(ColumnAddressWidth::OtherDevices)
-                .device_mode_configuration(DeviceModeConfiguration::Disabled)
-                .wait_time_cfg_commands(WaitTimeConfigurationCommands::new(40_000))
-                .flash_size(SerialFlashRegion::A1, 0x0020_0000)
-                .serial_clk_freq(SerialClockFrequency::MHz60)
-                .serial_flash_pad_type(FlashPadType::Quad);
-    }
-}
