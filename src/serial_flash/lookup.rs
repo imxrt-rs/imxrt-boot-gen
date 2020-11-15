@@ -1,17 +1,15 @@
 //! Lookup table
 
-use std::ops::{Index, IndexMut};
-
 pub use crate::flexspi_lut::*;
 
 /// The default sequence definition lookup indices
 ///
-/// `CommandSequence`s are looked up by the processor when it needs to
+/// `Command`s are looked up by the processor when it needs to
 /// interact with the flash chip. The enumeration lets us index back into
 /// the `Lookup` struct, and associate a sequence command for that action.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(usize)]
-pub enum CommandSequence {
+pub enum Command {
     Read = 0,
     ReadStatus = 1,
     WriteEnable = 3,
@@ -19,22 +17,6 @@ pub enum CommandSequence {
     PageProgram = 9,
     ChipErase = 11,
     Dummy = 15,
-}
-
-impl CommandSequence {
-    fn command_index_name(idx: usize) -> Option<&'static str> {
-        use CommandSequence::*;
-        match idx {
-            idx if idx == Read as usize => Some("READ"),
-            idx if idx == ReadStatus as usize => Some("READ_STATUS"),
-            idx if idx == WriteEnable as usize => Some("WRITE_ENABLE"),
-            idx if idx == EraseSector as usize => Some("ERASE_SECTOR"),
-            idx if idx == PageProgram as usize => Some("PAGE_PROGRAM"),
-            idx if idx == ChipErase as usize => Some("CHIP_ERASE"),
-            idx if idx == Dummy as usize => Some("DUMMY"),
-            _ => None,
-        }
-    }
 }
 
 /// Size of the lookup table in bytes
@@ -51,7 +33,7 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 /// ```
 /// use imxrt_boot_gen::serial_flash::{
 ///     LookupTable,
-///     CommandSequence,
+///     Command,
 ///     SequenceBuilder,
 ///     Sequence, Instr,
 ///     opcodes::sdr::*,
@@ -60,43 +42,41 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 /// };
 ///
 /// let mut lookup_table = LookupTable::new();
-/// lookup_table[CommandSequence::Read] = SequenceBuilder::new()
+/// lookup_table[Command::Read] = SequenceBuilder::new()
 ///     .instr(Instr::new(CMD, Pads::One, 0xEB))
 ///     .instr(Instr::new(RADDR, Pads::Four, 0x02))
 ///     .build();
 /// ```
+#[derive(Debug, Clone, Copy)]
+#[repr(transparent)]
 pub struct LookupTable([Sequence; NUMBER_OF_SEQUENCES]);
-
-impl Default for LookupTable {
-    fn default() -> LookupTable {
-        LookupTable([Sequence::stopped(); NUMBER_OF_SEQUENCES])
-    }
-}
 
 impl LookupTable {
     /// Create a new lookup table. All memory is set to zero.
-    pub fn new() -> Self {
-        Self::default()
+    pub const fn new() -> Self {
+        LookupTable([Sequence::stopped(); NUMBER_OF_SEQUENCES])
     }
-
-    pub(crate) fn iter(&self) -> impl Iterator<Item = (&Sequence, Option<&'static str>)> {
-        self.0
-            .iter()
-            .enumerate()
-            .map(|(idx, instr)| (instr, CommandSequence::command_index_name(idx)))
+    /// Assign the `sequence` to the command that is found at the `Command` index
+    pub const fn command(mut self, cmd: Command, sequence: Sequence) -> Self {
+        self.0[cmd as usize] = sequence;
+        self
     }
 }
 
-impl Index<CommandSequence> for LookupTable {
-    type Output = Sequence;
+#[cfg(test)]
+mod test {
+    use super::{Command, LookupTable};
+    use crate::serial_flash::SequenceBuilder;
 
-    fn index(&self, cmd: CommandSequence) -> &Sequence {
-        &self.0[cmd as usize]
-    }
-}
-
-impl IndexMut<CommandSequence> for LookupTable {
-    fn index_mut(&mut self, cmd: CommandSequence) -> &mut Sequence {
-        &mut self.0[cmd as usize]
+    #[test]
+    fn smoke() {
+        const _LUT: LookupTable = LookupTable::new()
+            .command(Command::Read, SequenceBuilder::new().build())
+            .command(Command::ReadStatus, SequenceBuilder::new().build())
+            .command(Command::WriteEnable, SequenceBuilder::new().build())
+            .command(Command::EraseSector, SequenceBuilder::new().build())
+            .command(Command::PageProgram, SequenceBuilder::new().build())
+            .command(Command::ChipErase, SequenceBuilder::new().build())
+            .command(Command::Dummy, SequenceBuilder::new().build());
     }
 }

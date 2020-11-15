@@ -2,10 +2,6 @@
 //!
 //! The module implements and documents the common FCB fields.
 
-use std::convert::TryFrom;
-use std::ops::{Index, IndexMut};
-use std::time::Duration;
-
 /// `readSampleClkSrc` of the general FCB   
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(u8)]
@@ -73,23 +69,16 @@ impl Default for DeviceModeConfiguration {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WaitTimeConfigurationCommands(pub(crate) u16);
 impl WaitTimeConfigurationCommands {
-    pub fn disable() -> Self {
+    pub const fn disable() -> Self {
         WaitTimeConfigurationCommands(0)
     }
 
-    /// Computes the wait time from the specified `wait_time`. The
-    /// provided duration should be divisible by `100us`, since the
-    /// value is a factor scaled by `100us`. Returns `None` if representing
-    /// this as a factor of `100us` returns `0`, or if the factor cannot be
-    /// expressed in a `u16`.
-    pub fn from_duration(wait_time: Duration) -> Option<Self> {
-        let us = wait_time.as_micros();
-        if us < 100 {
-            None
-        } else {
-            let factor = u16::try_from(us / 100).ok()?;
-            Some(WaitTimeConfigurationCommands(factor))
-        }
+    /// Computes the wait time from the specified `wait_time_us` (microseconds)
+    ///
+    /// The duration should be divisible by `100us`, since the
+    /// value is a factor scaled by `100us`
+    pub const fn new(wait_time_us: u16) -> Self {
+        WaitTimeConfigurationCommands(wait_time_us / 100)
     }
 }
 
@@ -135,26 +124,4 @@ pub enum SerialFlashRegion {
     A2,
     B1,
     B2,
-}
-
-#[derive(Debug, Clone, Copy, Default)]
-pub(crate) struct SerialFlashSize(pub(crate) [u32; 4]);
-
-impl Index<SerialFlashRegion> for SerialFlashSize {
-    type Output = u32;
-    fn index(&self, region: SerialFlashRegion) -> &u32 {
-        &self.0[region as usize]
-    }
-}
-
-impl IndexMut<SerialFlashRegion> for SerialFlashSize {
-    fn index_mut(&mut self, region: SerialFlashRegion) -> &mut u32 {
-        &mut self.0[region as usize]
-    }
-}
-
-impl SerialFlashSize {
-    pub(crate) fn new() -> Self {
-        SerialFlashSize::default()
-    }
 }

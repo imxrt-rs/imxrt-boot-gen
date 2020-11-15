@@ -14,12 +14,8 @@ pub(crate) const INSTRUCTION_SIZE: usize = 2;
 ///
 /// `Instr`s are used to create FlexSPI lookup table command [`Sequence`s](struct.Sequence.html).
 #[derive(Clone, Copy)]
-pub struct Instr {
-    /// Raw instructions
-    raw: [u8; INSTRUCTION_SIZE],
-    opcode: Opcode,
-    pads: Pads,
-}
+#[repr(transparent)]
+pub struct Instr([u8; INSTRUCTION_SIZE]);
 
 impl Instr {
     /// Create a new FlexSPI LUT instruction
@@ -28,53 +24,21 @@ impl Instr {
     /// there are pre-defined [`JUMP_ON_CS`](constant.JUMP_ON_CS.html) and [`STOP`](constant.STOP.html)
     /// instructions which you should use.
     pub const fn new(opcode: Opcode, pads: Pads, operand: u8) -> Self {
-        Instr {
-            // Little endian
-            raw: [operand, (opcode.0 << 2) | (pads as u8)],
-            opcode,
-            pads,
-        }
+        Instr([operand, (opcode.0 << 2) | (pads as u8)])
     }
 
     const fn stop() -> Self {
-        Instr {
-            raw: [0; INSTRUCTION_SIZE],
-            opcode: opcodes::STOP,
-            pads: Pads::One, // unused
-        }
+        Instr::new(opcodes::STOP, Pads::One /* unused */, 0)
     }
 
     const fn jump_on_cs() -> Self {
-        Instr {
-            raw: [0; INSTRUCTION_SIZE],
-            opcode: opcodes::JUMP_ON_CS,
-            pads: Pads::One, // unused
-        }
-    }
-
-    /// Returns the raw bytes representing this instruction
-    pub fn raw(&self) -> &[u8] {
-        &self.raw
-    }
-}
-
-impl fmt::Display for Instr {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.opcode {
-            opcodes::STOP => write!(f, "STOP"),
-            opcodes::JUMP_ON_CS => write!(f, "JUMP_ON_CS"),
-            opcode => write!(
-                f,
-                "OPCODE={}, PADS={}, OPERAND={:#02X}",
-                opcode, self.pads, self.raw[0]
-            ),
-        }
+        Instr::new(opcodes::JUMP_ON_CS, Pads::One /* unused */, 0)
     }
 }
 
 impl fmt::Debug for Instr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let raw = u16::from_le_bytes(self.raw);
+        let raw = u16::from_le_bytes(self.0);
         write!(f, "{:#02X}", raw)
     }
 }
@@ -93,20 +57,14 @@ pub(crate) const INSTRUCTIONS_PER_SEQUENCE: usize = 8;
 /// you're interacting with.
 ///
 /// `Sequence`s are used to create a [`LookupTable`](../serial_flash/lookup/struct.LookupTable.html).
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
+#[repr(transparent)]
 pub struct Sequence(pub(crate) [Instr; INSTRUCTIONS_PER_SEQUENCE]);
 pub(crate) const SEQUENCE_SIZE: usize = INSTRUCTIONS_PER_SEQUENCE * INSTRUCTION_SIZE;
 
 impl Sequence {
     pub(crate) const fn stopped() -> Self {
         Sequence([STOP; INSTRUCTIONS_PER_SEQUENCE])
-    }
-}
-
-impl fmt::Display for Sequence {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let instr_strs: Vec<String> = self.0.iter().map(ToString::to_string).collect();
-        write!(f, "{}", instr_strs.join(";"))
     }
 }
 
@@ -355,7 +313,7 @@ mod test {
         buffer
             .chunks_exact_mut(2)
             .zip(seq.0.iter())
-            .for_each(|(dst, src)| dst.copy_from_slice(&src.raw));
+            .for_each(|(dst, src)| dst.copy_from_slice(&src.0));
         buffer
     }
 

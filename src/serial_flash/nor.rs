@@ -1,5 +1,7 @@
 //! Fields specific for NOR flash
 
+use super::FlexSPIConfigurationBlock;
+
 /// `ipCmdSerialClkFreq` field for serial NOR-specific FCB
 ///
 /// Chip specific value, not used by ROM
@@ -26,8 +28,58 @@ pub enum SerialClockFrequency {
 
 /// The fields specific for defining a serial NOR FCB
 #[derive(Debug, Clone, Copy)]
+#[repr(C, packed)]
 pub struct ConfigurationBlock {
-    pub page_size: u32,
-    pub sector_size: u32,
-    pub ip_cmd_serial_clk_freq: SerialClockFrequency,
+    mem_cfg: FlexSPIConfigurationBlock,
+    page_size: u32,
+    sector_size: u32,
+    ip_cmd_serial_clk_freq: u32,
+    _reserved: [u8; 52],
+}
+
+impl ConfigurationBlock {
+    pub const fn new(mut mem_cfg: FlexSPIConfigurationBlock) -> Self {
+        mem_cfg.device_type = 1;
+        ConfigurationBlock {
+            mem_cfg,
+            page_size: 0,
+            sector_size: 0,
+            ip_cmd_serial_clk_freq: 0,
+            _reserved: [0; 52],
+        }
+    }
+    pub const fn page_size(mut self, page_size: u32) -> Self {
+        self.page_size = page_size;
+        self
+    }
+    pub const fn sector_size(mut self, sector_size: u32) -> Self {
+        self.sector_size = sector_size;
+        self
+    }
+    pub const fn ip_cmd_serial_clk_freq(
+        mut self,
+        serial_clock_frequency: SerialClockFrequency,
+    ) -> Self {
+        self.ip_cmd_serial_clk_freq = serial_clock_frequency as u32;
+        self
+    }
+}
+
+const _STATIC_ASSERT_SIZE: [u32; 1] =
+    [0; (core::mem::size_of::<ConfigurationBlock>() == 512) as usize];
+
+#[cfg(test)]
+mod test {
+    use super::{
+        super::LookupTable, ConfigurationBlock, FlexSPIConfigurationBlock, SerialClockFrequency,
+    };
+
+    #[test]
+    fn smoke() {
+        const _CFG: ConfigurationBlock =
+            ConfigurationBlock::new(FlexSPIConfigurationBlock::new(LookupTable::new()))
+                .page_size(256)
+                .sector_size(4095)
+                .ip_cmd_serial_clk_freq(SerialClockFrequency::MHz30);
+    }
 }

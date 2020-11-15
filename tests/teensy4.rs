@@ -51,45 +51,50 @@ const SEQ_CHIP_ERASE: Sequence = SequenceBuilder::new()
     .instr(Instr::new(CMD, Pads::One, CHIP_ERASE))
     .build();
 
+//
+// Lookup table
+//
+
+const LUT: LookupTable = LookupTable::new()
+    .command(Command::Read, SEQ_READ)
+    .command(Command::ReadStatus, SEQ_READ_STATUS)
+    .command(Command::WriteEnable, SEQ_WRITE_ENABLE)
+    .command(Command::EraseSector, SEQ_ERASE_SECTOR)
+    .command(Command::PageProgram, SEQ_PAGE_PROGRAM)
+    .command(Command::ChipErase, SEQ_CHIP_ERASE);
+
+//
+// Common FlexSPI configuration block
+//
+
+const FLEXSPI_CONFIGURATION_BLOCK: FlexSPIConfigurationBlock = FlexSPIConfigurationBlock::new(LUT)
+    .read_sample_clk_src(ReadSampleClockSource::LoopbackFromDQSPad)
+    .cs_hold_time(0x01)
+    .cs_setup_time(0x02)
+    .column_address_width(ColumnAddressWidth::OtherDevices)
+    .device_mode_configuration(DeviceModeConfiguration::Disabled)
+    .wait_time_cfg_commands(WaitTimeConfigurationCommands::disable())
+    .flash_size(SerialFlashRegion::A1, 0x0020_0000)
+    .serial_clk_freq(SerialClockFrequency::MHz60)
+    .serial_flash_pad_type(FlashPadType::Quad);
+
+//
+// Final serial NOR configuration block
+//
+// This is what you want to place in the i.MX RT boot section
+//
+
+const SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
+    nor::ConfigurationBlock::new(FLEXSPI_CONFIGURATION_BLOCK)
+        .page_size(256)
+        .sector_size(4096)
+        .ip_cmd_serial_clk_freq(nor::SerialClockFrequency::MHz30);
+
 #[test]
-fn teensy4_fcb() {
-    let nor_cb = nor::ConfigurationBlock {
-        page_size: 256,
-        sector_size: 4096,
-        ip_cmd_serial_clk_freq: nor::SerialClockFrequency::MHz30,
-    };
-
-    let lookup_table = {
-        use imxrt_boot_gen::serial_flash::CommandSequence::*;
-        let mut lut = LookupTable::new();
-        lut[Read] = SEQ_READ;
-        lut[ReadStatus] = SEQ_READ_STATUS;
-        lut[WriteEnable] = SEQ_WRITE_ENABLE;
-        lut[EraseSector] = SEQ_ERASE_SECTOR;
-        lut[PageProgram] = SEQ_PAGE_PROGRAM;
-        lut[ChipErase] = SEQ_CHIP_ERASE;
-        lut
-    };
-
-    let fcb = FCBBuilder::new(DeviceType::SerialNOR(nor_cb), lookup_table)
-        .read_sample_clk_src(ReadSampleClockSource::LoopbackFromDQSPad)
-        .cs_hold_time(0x01)
-        .cs_setup_time(0x02)
-        .column_address_width(ColumnAddressWidth::OtherDevices)
-        .device_mode_configuration(DeviceModeConfiguration::Disabled)
-        .wait_time_cfg_commands(WaitTimeConfigurationCommands::disable())
-        .flash_size(SerialFlashRegion::A1, 0x0020_0000)
-        .serial_clk_freq(SerialClockFrequency::MHz60)
-        .serial_flash_pad_type(FlashPadType::Quad)
-        .build()
-        .unwrap();
-
-    let mut actual: [u32; 128] = [0; 128];
-    for (bytes, slot) in fcb.as_bytes().chunks_exact(4).zip(actual.iter_mut()) {
-        use std::convert::TryInto;
-        *slot = u32::from_le_bytes(bytes.try_into().unwrap());
-    }
+fn teensy4() {
+    let actual: &[u32; 128] = unsafe { core::mem::transmute(&SERIAL_NOR_CONFIGURATION_BLOCK) };
     const CHUNK_TEST_SIZE: usize = 16;
+    let mut count = 0;
     for (idx, (actual_chunk, expected_chunk)) in actual
         .chunks(CHUNK_TEST_SIZE)
         .zip(EXPECTED.chunks(CHUNK_TEST_SIZE))
@@ -101,7 +106,9 @@ fn teensy4_fcb() {
             "Start index {}",
             idx * CHUNK_TEST_SIZE
         );
+        count += 1;
     }
+    assert_eq!(count, 128 / 16);
 }
 
 // A known, working FCB for the Teensy 4.
