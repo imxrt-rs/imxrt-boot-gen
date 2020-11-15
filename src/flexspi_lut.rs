@@ -88,36 +88,13 @@ pub(crate) const INSTRUCTIONS_PER_SEQUENCE: usize = 8;
 
 /// A collection of FlexSPI LUT instructions
 ///
-/// Each `Sequence` may have up to eight instructions. Any unused instructions must
-/// be inlined to [`STOP`](constant.STOP.html). The sequences you'll require are dependent
-/// on the specific flash memory that you're interacting with.
+/// Each `Sequence` may have up to eight instructions. Use [`SequenceBuilder`] to create
+/// a `Sequence`. The sequences you'll require are dependent on the specific flash memory that
+/// you're interacting with.
 ///
 /// `Sequence`s are used to create a [`LookupTable`](../serial_flash/lookup/struct.LookupTable.html).
-///
-/// # Example
-///
-/// ```
-/// use imxrt_boot_gen::serial_flash::{
-///     Sequence,
-///     Instr,
-///     STOP,
-///     Pads,
-///     opcodes::sdr::*,
-/// };
-///
-/// const SEQ_READ: Sequence = Sequence([
-///     Instr::new(CMD, Pads::One, 0xEB),
-///     Instr::new(READ, Pads::Four, 0x04),
-///     STOP,
-///     STOP,
-///     STOP,
-///     STOP,
-///     STOP,
-///     STOP,
-/// ]);
-/// ```
 #[derive(Clone, Copy)]
-pub struct Sequence(pub [Instr; INSTRUCTIONS_PER_SEQUENCE]);
+pub struct Sequence(pub(crate) [Instr; INSTRUCTIONS_PER_SEQUENCE]);
 pub(crate) const SEQUENCE_SIZE: usize = INSTRUCTIONS_PER_SEQUENCE * INSTRUCTION_SIZE;
 
 impl Sequence {
@@ -371,7 +348,6 @@ mod test {
     use super::opcodes::sdr::*;
     use super::Instr;
     use super::Pads;
-    use super::STOP;
     use super::{Sequence, SequenceBuilder};
 
     fn seq_to_bytes(seq: Sequence) -> Vec<u8> {
@@ -395,26 +371,6 @@ mod test {
             0xEB, 0x04, 0x18, 0x0A, 0x06, 0x32, 0x04, 0x26, 0, 0, 0, 0, 0, 0, 0, 0,
         ];
 
-        const SEQUENCE: Sequence = Sequence([
-            Instr::new(CMD, Pads::One, 0xEB),
-            Instr::new(RADDR, Pads::Four, 0x18),
-            Instr::new(DUMMY, Pads::Four, 0x06),
-            Instr::new(READ, Pads::Four, 0x04),
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-        ]);
-
-        assert_eq!(&seq_to_bytes(SEQUENCE), &EXPECTED);
-    }
-
-    #[test]
-    fn teensy4_read_builder() {
-        const EXPECTED: [u8; super::SEQUENCE_SIZE] = [
-            0xEB, 0x04, 0x18, 0x0A, 0x06, 0x32, 0x04, 0x26, 0, 0, 0, 0, 0, 0, 0, 0,
-        ];
-
         const SEQUENCE: Sequence = SequenceBuilder::new()
             .instr(Instr::new(CMD, Pads::One, 0xEB))
             .instr(Instr::new(RADDR, Pads::Four, 0x18))
@@ -428,22 +384,6 @@ mod test {
     #[test]
     fn teensy4_read_status() {
         const EXPECTED: [u8; 4] = [0x05, 0x04, 0x04, 0x24];
-        const SEQUENCE: Sequence = Sequence([
-            Instr::new(CMD, Pads::One, 0x05),
-            Instr::new(READ, Pads::One, 0x04),
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-        ]);
-        assert_eq!(&seq_to_bytes(SEQUENCE)[0..4], &EXPECTED);
-    }
-
-    #[test]
-    fn teensy4_read_status_builder() {
-        const EXPECTED: [u8; 4] = [0x05, 0x04, 0x04, 0x24];
         const SEQUENCE: Sequence = SequenceBuilder::new()
             .instr(Instr::new(CMD, Pads::One, 0x05))
             .instr(Instr::new(READ, Pads::One, 0x04))
@@ -454,64 +394,39 @@ mod test {
     #[test]
     fn teensy4_write_enable() {
         const EXPECTED: u128 = 0x0000_0406;
-        const SEQUENCE: Sequence = Sequence([
-            Instr::new(CMD, Pads::One, 0x06),
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-        ]);
+        const SEQUENCE: Sequence = SequenceBuilder::new()
+            .instr(Instr::new(CMD, Pads::One, 0x06))
+            .build();
         assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(SEQUENCE)[..]);
     }
 
     #[test]
     fn teensy4_erase_sector() {
         const EXPECTED: u128 = 0x0818_0420;
-        const SEQUENCE: Sequence = Sequence([
-            Instr::new(CMD, Pads::One, 0x20),
-            Instr::new(RADDR, Pads::One, 0x18),
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-        ]);
+        const SEQUENCE: Sequence = SequenceBuilder::new()
+            .instr(Instr::new(CMD, Pads::One, 0x20))
+            .instr(Instr::new(RADDR, Pads::One, 0x18))
+            .build();
         assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(SEQUENCE)[..]);
     }
 
     #[test]
     fn teensy4_page_program() {
         const EXPECTED: u128 = 0x0000_2004_0818_0402;
-        const SEQUENCE: Sequence = Sequence([
-            Instr::new(CMD, Pads::One, 0x02),
-            Instr::new(RADDR, Pads::One, 0x18),
-            Instr::new(WRITE, Pads::One, 0x04),
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-        ]);
+        const SEQUENCE: Sequence = SequenceBuilder::new()
+            .instr(Instr::new(CMD, Pads::One, 0x02))
+            .instr(Instr::new(RADDR, Pads::One, 0x18))
+            .instr(Instr::new(WRITE, Pads::One, 0x04))
+            .build();
         assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(SEQUENCE)[..]);
     }
 
     #[test]
     fn teensy4_chip_erase() {
         const EXPECTED: u128 = 0x0000_0460;
-        const SEQUENCE: Sequence = Sequence([
-            Instr::new(CMD, Pads::One, 0x60),
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-            STOP,
-        ]);
+        const SEQUENCE: Sequence = SequenceBuilder::new()
+            .instr(Instr::new(CMD, Pads::One, 0x60))
+            .build();
         assert_eq!(&EXPECTED.to_le_bytes(), &seq_to_bytes(SEQUENCE)[..]);
     }
 }

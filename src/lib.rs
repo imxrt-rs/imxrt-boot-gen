@@ -69,28 +69,18 @@
 //! };
 //!
 //! // READ sequence
-//! const SEQ_READ: Sequence = Sequence([
-//!     Instr::new(CMD, Pads::One, 0xEB),
-//!     Instr::new(RADDR, Pads::Four, 0x18),
-//!     Instr::new(DUMMY, Pads::Four, 0x06),
-//!     Instr::new(READ, Pads::Four, 0x04),
-//!     STOP,
-//!     STOP,
-//!     STOP,
-//!     STOP,
-//! ]);
+//! const SEQ_READ: Sequence = SequenceBuilder::new()
+//!     .instr(Instr::new(CMD, Pads::One, 0xEB))
+//!     .instr(Instr::new(RADDR, Pads::Four, 0x18))
+//!     .instr(Instr::new(DUMMY, Pads::Four, 0x06))
+//!     .instr(Instr::new(READ, Pads::Four, 0x04))
+//!     .build();
 //!
 //! // ERASE SECTOR sequence
-//! const SEQ_ERASE_SECTOR: Sequence = Sequence([
-//!     Instr::new(CMD, Pads::One, 0x20),
-//!     Instr::new(RADDR, Pads::One, 0x18),
-//!     STOP,
-//!     STOP,
-//!     STOP,
-//!     STOP,
-//!     STOP,
-//!     STOP,
-//! ]);
+//! const SEQ_ERASE_SECTOR: Sequence = SequenceBuilder::new()
+//!     .instr(Instr::new(CMD, Pads::One, 0x20))
+//!     .instr(Instr::new(RADDR, Pads::One, 0x18))
+//!     .build();
 //! // Other sequences...
 //!
 //! // Add the sequences in the lookup table

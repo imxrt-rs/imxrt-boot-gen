@@ -20,71 +20,36 @@ use winbond::*;
 // Sequences for lookup table
 //
 
-const SEQ_READ: Sequence = Sequence([
-    Instr::new(CMD, Pads::One, FAST_READ_QUAD_IO),
-    Instr::new(RADDR, Pads::Four, 0x18),
-    Instr::new(DUMMY, Pads::Four, 0x06),
-    Instr::new(READ, Pads::Four, 0x04),
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-]);
+const SEQ_READ: Sequence = SequenceBuilder::new()
+    .instr(Instr::new(CMD, Pads::One, FAST_READ_QUAD_IO))
+    .instr(Instr::new(RADDR, Pads::Four, 0x18))
+    .instr(Instr::new(DUMMY, Pads::Four, 0x06))
+    .instr(Instr::new(READ, Pads::Four, 0x04))
+    .build();
 
-const SEQ_READ_STATUS: Sequence = Sequence([
-    Instr::new(CMD, Pads::One, READ_STATUS_REGISTER_1),
-    Instr::new(READ, Pads::One, 0x04),
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-]);
+const SEQ_READ_STATUS: Sequence = SequenceBuilder::new()
+    .instr(Instr::new(CMD, Pads::One, READ_STATUS_REGISTER_1))
+    .instr(Instr::new(READ, Pads::One, 0x04))
+    .build();
 
-const SEQ_WRITE_ENABLE: Sequence = Sequence([
-    Instr::new(CMD, Pads::One, WRITE_ENABLE),
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-]);
+const SEQ_WRITE_ENABLE: Sequence = SequenceBuilder::new()
+    .instr(Instr::new(CMD, Pads::One, WRITE_ENABLE))
+    .build();
 
-const SEQ_ERASE_SECTOR: Sequence = Sequence([
-    Instr::new(CMD, Pads::One, SECTOR_ERASE),
-    Instr::new(RADDR, Pads::One, 0x18),
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-]);
+const SEQ_ERASE_SECTOR: Sequence = SequenceBuilder::new()
+    .instr(Instr::new(CMD, Pads::One, SECTOR_ERASE))
+    .instr(Instr::new(RADDR, Pads::One, 0x18))
+    .build();
 
-const SEQ_PAGE_PROGRAM: Sequence = Sequence([
-    Instr::new(CMD, Pads::One, PAGE_PROGRAM),
-    Instr::new(RADDR, Pads::One, 0x18),
-    Instr::new(WRITE, Pads::One, 0x04),
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-]);
+const SEQ_PAGE_PROGRAM: Sequence = SequenceBuilder::new()
+    .instr(Instr::new(CMD, Pads::One, PAGE_PROGRAM))
+    .instr(Instr::new(RADDR, Pads::One, 0x18))
+    .instr(Instr::new(WRITE, Pads::One, 0x04))
+    .build();
 
-const SEQ_CHIP_ERASE: Sequence = Sequence([
-    Instr::new(CMD, Pads::One, CHIP_ERASE),
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-    STOP,
-]);
+const SEQ_CHIP_ERASE: Sequence = SequenceBuilder::new()
+    .instr(Instr::new(CMD, Pads::One, CHIP_ERASE))
+    .build();
 
 #[test]
 fn teensy4_fcb() {

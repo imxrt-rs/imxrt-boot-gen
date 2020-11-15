@@ -52,6 +52,7 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 /// use imxrt_boot_gen::serial_flash::{
 ///     LookupTable,
 ///     CommandSequence,
+///     SequenceBuilder,
 ///     Sequence, Instr,
 ///     opcodes::sdr::*,
 ///     Pads,
@@ -59,16 +60,10 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 /// };
 ///
 /// let mut lookup_table = LookupTable::new();
-/// lookup_table[CommandSequence::Read] = Sequence([
-///     Instr::new(CMD, Pads::One, 0xEB),
-///     Instr::new(RADDR, Pads::Four, 0x02),
-///     STOP,
-///     STOP,
-///     STOP,
-///     STOP,
-///     STOP,
-///     STOP,
-/// ]);
+/// lookup_table[CommandSequence::Read] = SequenceBuilder::new()
+///     .instr(Instr::new(CMD, Pads::One, 0xEB))
+///     .instr(Instr::new(RADDR, Pads::Four, 0x02))
+///     .build();
 /// ```
 pub struct LookupTable([Sequence; NUMBER_OF_SEQUENCES]);
 
