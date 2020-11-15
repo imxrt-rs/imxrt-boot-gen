@@ -130,5 +130,7 @@
 //! The name is not mangled. It may be referenced in a linker script by its section,
 //! `".fcb"`. Given the ABI guarantees, the FCB should be usable from both Rust and C.
 
+#![cfg_attr(not(test), no_std)]
+
 mod flexspi_lut;
 pub mod serial_flash;

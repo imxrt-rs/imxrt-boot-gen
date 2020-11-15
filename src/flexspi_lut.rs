@@ -3,7 +3,7 @@
 //! Derived from the iMXRT1060 Reference Manual (Rev 2),
 //! section 27.5.8.
 
-use std::fmt;
+use core::fmt;
 
 pub(crate) const INSTRUCTION_SIZE: usize = 2;
 
