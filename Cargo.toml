@@ -22,10 +22,9 @@ keywords = [
 [dependencies]
 
 [features]
-imxrt1011 = []
-imxrt1061 = []
-imxrt1062 = []
+imxrt1010 = []
+imxrt1060 = []
 imxrt1064 = []
 
 [package.metadata.docs.rs]
-features = ["imxrt1062"]
+features = ["imxrt1060"]

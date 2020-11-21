@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        feature: ["imxrt1011", "imxrt1061", "imxrt1062", "imxrt1064"]
+        feature: ["imxrt1010", "imxrt1060", "imxrt1064"]
 
     runs-on: ubuntu-latest
 
@@ -20,7 +20,7 @@ jobs:
   clippy:
     strategy:
       matrix:
-        feature: ["imxrt1011", "imxrt1062"] # Using a iMXRT family subset, assuming the 106x chips have the same features
+        feature: ["imxrt1010", "imxrt1060"]
       
     runs-on: ubuntu-latest
 

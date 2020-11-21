@@ -21,7 +21,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! imxrt-boot-gen = { features = ["imxrt1062"] }
+//! imxrt-boot-gen = { features = ["imxrt1060"] }
 //! ```
 //!
 //! The entire API is `const`. You may define your data structures at compile
