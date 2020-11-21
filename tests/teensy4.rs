@@ -1,6 +1,6 @@
 //! Serial NOR configuration block for the Teensy 4
 
-use imxrt_boot_gen::flexspi::{opcodes::sdr::*, *};
+use imxrt_boot_gen::flexspi::{self, opcodes::sdr::*, *};
 use imxrt_boot_gen::serial_flash::*;
 
 /// Instructions for the Winbond W25Q16JV
@@ -67,16 +67,17 @@ const LUT: LookupTable = LookupTable::new()
 // Common FlexSPI configuration block
 //
 
-const FLEXSPI_CONFIGURATION_BLOCK: FlexSPIConfigurationBlock = FlexSPIConfigurationBlock::new(LUT)
-    .read_sample_clk_src(ReadSampleClockSource::LoopbackFromDQSPad)
-    .cs_hold_time(0x01)
-    .cs_setup_time(0x02)
-    .column_address_width(ColumnAddressWidth::OtherDevices)
-    .device_mode_configuration(DeviceModeConfiguration::Disabled)
-    .wait_time_cfg_commands(WaitTimeConfigurationCommands::disable())
-    .flash_size(SerialFlashRegion::A1, 0x0020_0000)
-    .serial_clk_freq(SerialClockFrequency::MHz60)
-    .serial_flash_pad_type(FlashPadType::Quad);
+const FLEXSPI_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
+    flexspi::ConfigurationBlock::new(LUT)
+        .read_sample_clk_src(ReadSampleClockSource::LoopbackFromDQSPad)
+        .cs_hold_time(0x01)
+        .cs_setup_time(0x02)
+        .column_address_width(ColumnAddressWidth::OtherDevices)
+        .device_mode_configuration(DeviceModeConfiguration::Disabled)
+        .wait_time_cfg_commands(WaitTimeConfigurationCommands::disable())
+        .flash_size(SerialFlashRegion::A1, 0x0020_0000)
+        .serial_clk_freq(SerialClockFrequency::MHz60)
+        .serial_flash_pad_type(FlashPadType::Quad);
 
 //
 // Final serial NOR configuration block

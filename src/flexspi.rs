@@ -52,7 +52,7 @@
 //! # FlexSPI Configuration Block
 //!
 //! Once you've created your sequences and lookup table, use the lookup table to create
-//! a [`FlexSPIConfigurationBlock`]. See the `FlexSPIConfigurationBlock` documentation
+//! a [`ConfigurationBlock`]. See the `ConfigurationBlock` documentation
 //! for more information.
 
 mod fields;
@@ -73,11 +73,11 @@ const VERSION: u32 = 0x5601_0000;
 
 /// The recommended `csHoldTime`, `0x03`.
 ///
-/// This is the default value if not set with [`FlexSPIConfigurationBlock::cs_hold_time`].
+/// This is the default value if not set with [`ConfigurationBlock::cs_hold_time`].
 pub const RECOMMENDED_CS_HOLD_TIME: u8 = 0x03;
 /// The recommended `csSetupTime`, `0x03`.
 ///
-/// This is the default value if not set with [`FlexSPIConfigurationBlock::cs_setup_time`].
+/// This is the default value if not set with [`ConfigurationBlock::cs_setup_time`].
 pub const RECOMMENDED_CS_SETUP_TIME: u8 = 0x03;
 
 /// FlexSPI configuration block
@@ -99,8 +99,8 @@ pub const RECOMMENDED_CS_SETUP_TIME: u8 = 0x03;
 /// use imxrt_boot_gen::flexspi::*;
 ///
 /// # const LUT: LookupTable = LookupTable::new();
-/// const FLEXSPI_CONFIGURATION_BLOCK: FlexSPIConfigurationBlock =
-///     FlexSPIConfigurationBlock::new(LUT)
+/// const FLEXSPI_CONFIGURATION_BLOCK: ConfigurationBlock =
+///     ConfigurationBlock::new(LUT)
 ///         .read_sample_clk_src(ReadSampleClockSource::LoopbackFromDQSPad)
 ///         .cs_hold_time(0x01)
 ///         .cs_setup_time(0x02)
@@ -113,7 +113,7 @@ pub const RECOMMENDED_CS_SETUP_TIME: u8 = 0x03;
 ///
 #[derive(Debug, Clone, Copy)]
 #[repr(C, packed)]
-pub struct FlexSPIConfigurationBlock {
+pub struct ConfigurationBlock {
     tag: u32,
     version: u32,
     _reserved0: [u8; 4], // 0x008
@@ -154,11 +154,11 @@ pub struct FlexSPIConfigurationBlock {
     _reserved6: [u8; 16],
 }
 
-impl FlexSPIConfigurationBlock {
+impl ConfigurationBlock {
     /// Create a new configuration block that uses `lookup_table` as the
     /// FlexSPI LUT
     pub const fn new(lookup_table: LookupTable) -> Self {
-        FlexSPIConfigurationBlock {
+        ConfigurationBlock {
             tag: TAG,
             version: VERSION,
             read_sample_clk_src: ReadSampleClockSource::InternalLoopback as u8,
@@ -295,4 +295,4 @@ impl FlexSPIConfigurationBlock {
 }
 
 const _STATIC_ASSERT_SIZE: [u32; 1] =
-    [0; (core::mem::size_of::<FlexSPIConfigurationBlock>() == 448) as usize];
+    [0; (core::mem::size_of::<ConfigurationBlock>() == 448) as usize];

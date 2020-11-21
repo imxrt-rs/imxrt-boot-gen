@@ -1,6 +1,6 @@
 //! Serial NOR configuration blocks and fields
 
-use crate::flexspi::FlexSPIConfigurationBlock;
+use crate::flexspi;
 
 /// `ipCmdSerialClkFreq` field for serial NOR-specific FCB
 ///
@@ -37,9 +37,9 @@ pub enum SerialClockFrequency {
 ///
 /// ```no_run
 /// use imxrt_boot_gen::serial_flash::nor;
-/// # use imxrt_boot_gen::flexspi::{FlexSPIConfigurationBlock, LookupTable};
+/// # use imxrt_boot_gen::flexspi::{self, LookupTable};
 ///
-/// # const FLEXSPI_CONFIGURATION_BLOCK: FlexSPIConfigurationBlock = FlexSPIConfigurationBlock::new(LookupTable::new());
+/// # const FLEXSPI_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock = flexspi::ConfigurationBlock::new(LookupTable::new());
 /// #[no_mangle]
 /// #[link_section = ".serial_nor_cb"]
 /// static SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
@@ -51,7 +51,7 @@ pub enum SerialClockFrequency {
 #[derive(Debug, Clone, Copy)]
 #[repr(C, packed)]
 pub struct ConfigurationBlock {
-    mem_cfg: FlexSPIConfigurationBlock,
+    mem_cfg: flexspi::ConfigurationBlock,
     page_size: u32,
     sector_size: u32,
     ip_cmd_serial_clk_freq: u32,
@@ -61,7 +61,7 @@ pub struct ConfigurationBlock {
 impl ConfigurationBlock {
     /// Create a new serial NOR configuration block based on the FlexSPI configuration
     /// block
-    pub const fn new(mut mem_cfg: FlexSPIConfigurationBlock) -> Self {
+    pub const fn new(mut mem_cfg: flexspi::ConfigurationBlock) -> Self {
         mem_cfg.device_type = 1;
         ConfigurationBlock {
             mem_cfg,
@@ -96,13 +96,13 @@ const _STATIC_ASSERT_SIZE: [u32; 1] =
 
 #[cfg(test)]
 mod test {
-    use super::{ConfigurationBlock, FlexSPIConfigurationBlock, SerialClockFrequency};
+    use super::{flexspi, ConfigurationBlock, SerialClockFrequency};
     use crate::flexspi::LookupTable;
 
     #[test]
     fn smoke() {
         const _CFG: ConfigurationBlock =
-            ConfigurationBlock::new(FlexSPIConfigurationBlock::new(LookupTable::new()))
+            ConfigurationBlock::new(flexspi::ConfigurationBlock::new(LookupTable::new()))
                 .page_size(256)
                 .sector_size(4095)
                 .ip_cmd_serial_clk_freq(SerialClockFrequency::MHz30);
