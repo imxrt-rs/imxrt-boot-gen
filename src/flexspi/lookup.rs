@@ -1,6 +1,6 @@
-//! Lookup table
+//! FlexSPI Lookup table
 
-pub use crate::flexspi_lut::*;
+use super::sequence::{Sequence, SEQUENCE_SIZE};
 
 /// The default sequence definition lookup indices
 ///
@@ -31,7 +31,7 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 /// Any unspecified command is set to a sequence of STOPs.
 ///
 /// ```
-/// use imxrt_boot_gen::serial_flash::{
+/// use imxrt_boot_gen::flexspi::{
 ///     LookupTable,
 ///     Command,
 ///     SequenceBuilder,
@@ -65,7 +65,7 @@ impl LookupTable {
 #[cfg(test)]
 mod test {
     use super::{Command, LookupTable};
-    use crate::serial_flash::SequenceBuilder;
+    use crate::flexspi::sequence::SequenceBuilder;
 
     #[test]
     fn smoke() {

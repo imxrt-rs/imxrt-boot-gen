@@ -1,6 +1,4 @@
-//! FCB fields
-//!
-//! The module implements and documents the common FCB fields.
+//! FlexSPI configuration block fields
 
 /// `readSampleClkSrc` of the general FCB   
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -20,17 +18,17 @@ pub enum ColumnAddressWidth {
 }
 
 /// Sequence parameter for device mode configuration
-#[derive(Default, Clone, Copy, PartialEq, Eq)]
+#[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
 #[repr(transparent)]
-pub struct DeviceModeSequence(pub(crate) [u8; 4]);
+pub struct DeviceModeSequence([u8; 4]);
 impl DeviceModeSequence {
     /// Create a new sequence parameter for device configuration
     ///
     /// `starting_lut_index`: starting LUT index of Device mode configuration command
     /// `number_of_luts`: number of LUT sequences for Device mode configuration command
-    pub fn new(number_of_luts: u8, starting_lut_index: u8) -> Self {
+    pub const fn new(number_of_luts: u8, starting_lut_index: u8) -> Self {
         DeviceModeSequence(
-            ((u32::from(starting_lut_index) << 8) | u32::from(number_of_luts)).to_le_bytes(),
+            (((starting_lut_index as u32) << 8) | (number_of_luts as u32)).to_le_bytes(),
         )
     }
 }
@@ -68,7 +66,8 @@ impl Default for DeviceModeConfiguration {
 /// > for all device memory configuration commands instead of using read
 /// > status to wait until these commands complete.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct WaitTimeConfigurationCommands(pub(crate) u16);
+#[repr(transparent)]
+pub struct WaitTimeConfigurationCommands(u16);
 impl WaitTimeConfigurationCommands {
     pub const fn disable() -> Self {
         WaitTimeConfigurationCommands(0)
@@ -81,15 +80,6 @@ impl WaitTimeConfigurationCommands {
     pub const fn new(wait_time_us: u16) -> Self {
         WaitTimeConfigurationCommands(wait_time_us / 100)
     }
-}
-
-/// Describes the `deviceType` field.
-///
-/// Only the SerialNOR is implemented; `DeviceType`
-/// may also have `SerialNAND` in the future.
-#[derive(Debug, Clone, Copy)]
-pub enum DeviceType {
-    SerialNOR(super::nor::ConfigurationBlock),
 }
 
 /// `sFlashPad` field

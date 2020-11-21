@@ -1,6 +1,6 @@
 //! Serial NOR configuration block for the Teensy 4
 
-use imxrt_boot_gen::serial_flash::opcodes::sdr::*;
+use imxrt_boot_gen::flexspi::{opcodes::sdr::*, *};
 use imxrt_boot_gen::serial_flash::*;
 
 /// Instructions for the Winbond W25Q16JV

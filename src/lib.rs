@@ -1,4 +1,4 @@
-//! Generate data structures for booting iMXRT processors
+//! Generate data structures for booting i.MX RT processors
 //!
 //! # Rationale
 //!
@@ -28,5 +28,5 @@
 
 #![cfg_attr(not(test), no_std)]
 
-mod flexspi_lut;
+pub mod flexspi;
 pub mod serial_flash;

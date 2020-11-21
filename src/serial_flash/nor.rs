@@ -1,10 +1,10 @@
 //! Serial NOR configuration blocks and fields
 
-use super::FlexSPIConfigurationBlock;
+use crate::flexspi::FlexSPIConfigurationBlock;
 
 /// `ipCmdSerialClkFreq` field for serial NOR-specific FCB
 ///
-/// Chip specific value, not used by ROM
+/// Chip specific value, not used by ROM.
 #[derive(Debug, Clone, Copy)]
 #[repr(u8)]
 pub enum SerialClockFrequency {
@@ -33,9 +33,11 @@ pub enum SerialClockFrequency {
 /// a link section, so that you can more easily place the memory in your linker
 /// script.
 ///
+/// Unless otherwise specified, all unset fields are set to a bitpattern of zero.
+///
 /// ```no_run
 /// use imxrt_boot_gen::serial_flash::nor;
-/// # use imxrt_boot_gen::serial_flash::{FlexSPIConfigurationBlock, LookupTable};
+/// # use imxrt_boot_gen::flexspi::{FlexSPIConfigurationBlock, LookupTable};
 ///
 /// # const FLEXSPI_CONFIGURATION_BLOCK: FlexSPIConfigurationBlock = FlexSPIConfigurationBlock::new(LookupTable::new());
 /// #[no_mangle]
@@ -57,6 +59,8 @@ pub struct ConfigurationBlock {
 }
 
 impl ConfigurationBlock {
+    /// Create a new serial NOR configuration block based on the FlexSPI configuration
+    /// block
     pub const fn new(mut mem_cfg: FlexSPIConfigurationBlock) -> Self {
         mem_cfg.device_type = 1;
         ConfigurationBlock {
@@ -67,14 +71,17 @@ impl ConfigurationBlock {
             _reserved: [0; 52],
         }
     }
+    /// Set the serial NOR page size
     pub const fn page_size(mut self, page_size: u32) -> Self {
         self.page_size = page_size;
         self
     }
+    /// Set the serial NOR sector size
     pub const fn sector_size(mut self, sector_size: u32) -> Self {
         self.sector_size = sector_size;
         self
     }
+    /// Set the serial clock frequency
     pub const fn ip_cmd_serial_clk_freq(
         mut self,
         serial_clock_frequency: SerialClockFrequency,
@@ -89,9 +96,8 @@ const _STATIC_ASSERT_SIZE: [u32; 1] =
 
 #[cfg(test)]
 mod test {
-    use super::{
-        super::LookupTable, ConfigurationBlock, FlexSPIConfigurationBlock, SerialClockFrequency,
-    };
+    use super::{ConfigurationBlock, FlexSPIConfigurationBlock, SerialClockFrequency};
+    use crate::flexspi::LookupTable;
 
     #[test]
     fn smoke() {

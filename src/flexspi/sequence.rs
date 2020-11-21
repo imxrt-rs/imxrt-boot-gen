@@ -1,4 +1,4 @@
-//! FlexSPI Lookup Table (LUT) instructions, opcodes, and sequences
+//! FlexSPI instructions, opcodes, and sequences
 //!
 //! Derived from the iMXRT1060 Reference Manual (Rev 2),
 //! section 27.5.8.
@@ -56,7 +56,7 @@ pub(crate) const INSTRUCTIONS_PER_SEQUENCE: usize = 8;
 /// a `Sequence`. The sequences you'll require are dependent on the specific flash memory that
 /// you're interacting with.
 ///
-/// `Sequence`s are used to create a [`LookupTable`].
+/// `Sequence`s are used to create a [`LookupTable`](crate::flexspi::LookupTable).
 #[derive(Clone, Copy, Debug)]
 #[repr(transparent)]
 pub struct Sequence(pub(crate) [Instr; INSTRUCTIONS_PER_SEQUENCE]);
@@ -78,7 +78,7 @@ impl Sequence {
 /// # Example
 ///
 /// ```
-/// use imxrt_boot_gen::serial_flash::{
+/// use imxrt_boot_gen::flexspi::{
 ///     Sequence,
 ///     SequenceBuilder,
 ///     Instr,
@@ -397,7 +397,7 @@ mod test {
 //
 
 /// ```
-/// use imxrt_boot_gen::serial_flash::{*, opcodes::sdr::*};
+/// use imxrt_boot_gen::flexspi::{*, opcodes::sdr::*};
 /// const INSTR: Instr = Instr::new(RADDR, Pads::Four, 0x18);
 /// const OUT_OF_BOUNDS: Sequence = SequenceBuilder::new()
 ///     .instr(INSTR)
@@ -414,7 +414,7 @@ mod test {
 struct SequenceBuilderInstructionLimit;
 
 /// ```compile_fail
-/// use imxrt_boot_gen::serial_flash::{*, opcodes::sdr::*};
+/// use imxrt_boot_gen::flexspi::{*, opcodes::sdr::*};
 /// const INSTR: Instr = Instr::new(RADDR, Pads::Four, 0x18);
 /// const OUT_OF_BOUNDS: Sequence = SequenceBuilder::new()
 ///     .instr(INSTR)
