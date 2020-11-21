@@ -2,11 +2,11 @@
 //!
 //! # Rationale
 //!
-//! iMXRT processors require certain data structures in flash in order to configure
+//! i.MX RT processors require certain data structures in order to configure
 //! FlexSPI and / or SEMC peripherals. The data structurs must be placed
 //! in a certain region of FLASH, with values that describe how a peripheral should
-//! interact with NAND- / NOR-based FLASH memory. The data structures have a lot of magic
-//! numbers, and it would be nice to have an API to correctly generate the values.
+//! interact with persistent memory. The data structures have a lot of magic
+//! numbers, and need a very particular layout in order to boot the system.
 //!
 //! The `imxrt-boot-gen` crate helps you make data structures to boot i.MX RT processors.
 //! As of this writing, the API supports
@@ -23,6 +23,9 @@
 //! [dependencies]
 //! imxrt-boot-gen = { features = ["imxrt1062"] }
 //! ```
+//!
+//! The entire API is `const`. You may define your data structures at compile
+//! time, and assign them to `static` memory in your embedded program.
 //!
 //! See the module-level documentation for more information about the API.
 
