@@ -1,5 +1,7 @@
 //! Serial NOR configuration block for the Teensy 4
 
+#![cfg(feature = "imxrt1060")]
+
 use imxrt_boot_gen::flexspi::{self, opcodes::sdr::*, *};
 use imxrt_boot_gen::serial_flash::*;
 
