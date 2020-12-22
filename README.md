@@ -2,6 +2,14 @@
 
 Generate i.MX RT boot-time data structures.
 
+[![crates-io-shield][]][crates-io]
+[![docs-rs-shield][]][docs-rs]
+
+[crates-io-shield]: https://img.shields.io/crates/v/imxrt-boot-gen
+[crates-io]: https://crates.io/crates/imxrt-boot-gen
+[docs-rs-shield]: https://docs.rs/imxrt-boot-gen/badge.svg
+[docs-rs]: https://docs.rs/imxrt-boot-gen/
+
 ## Rationale
 
 i.MX RT processors require certain data structures in order to configure
