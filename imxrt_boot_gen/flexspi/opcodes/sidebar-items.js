@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["ddr","Dual data transfer rate (DDR) opcodes"],["sdr","Single data transfer rate (SDR) opcodes"]]});

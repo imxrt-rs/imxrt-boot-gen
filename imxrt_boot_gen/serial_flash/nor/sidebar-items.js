@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["SerialClockFrequency","`ipCmdSerialClkFreq` field for serial NOR-specific FCB"]],"struct":[["ConfigurationBlock","A serial NOR configuration block"]]});

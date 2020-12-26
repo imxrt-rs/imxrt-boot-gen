@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["nor","Serial NOR configuration blocks and fields"]]});
