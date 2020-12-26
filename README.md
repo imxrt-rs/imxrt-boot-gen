@@ -10,6 +10,8 @@ Generate i.MX RT boot-time data structures.
 [docs-rs-shield]: https://docs.rs/imxrt-boot-gen/badge.svg
 [docs-rs]: https://docs.rs/imxrt-boot-gen/
 
+### [API docs (main branch)](https://imxrt-rs.github.io/imxrt-boot-gen/)
+
 ## Rationale
 
 i.MX RT processors require certain data structures in order to configure

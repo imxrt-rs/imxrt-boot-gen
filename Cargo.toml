@@ -28,3 +28,4 @@ imxrt1064 = []
 
 [package.metadata.docs.rs]
 features = ["imxrt1060"]
+default-target = "thumbv7em-none-eabihf"
