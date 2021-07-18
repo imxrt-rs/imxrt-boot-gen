@@ -135,7 +135,7 @@ pub struct ConfigurationBlock {
     controller_misc_options: u32,
     pub(crate) device_type: u8,
     serial_flash_pad_type: u8,
-    serial_clk_freq: u8,
+    serial_clk_freq: SerialClockFrequency,
     lut_custom_seq_enable: u8,
     _reserved5: [u8; 8], // 0x048
     /// A1, A2, B1, B2
@@ -175,7 +175,7 @@ impl ConfigurationBlock {
             controller_misc_options: 0,
             device_type: 0, // Invalid value; must be updated in NOR / NAND configuration block
             serial_flash_pad_type: 1, // Single pad
-            serial_clk_freq: 0, // 30MHz
+            serial_clk_freq: SerialClockFrequency::MHz30, // 30MHz
             lut_custom_seq_enable: 0,
             serial_flash_sizes: [0; 4],
             cs_pad_setting_override: 0,
@@ -281,7 +281,7 @@ impl ConfigurationBlock {
     ///
     /// If not set, this defaults to `SerialClockFrequency::MHz30`.
     pub const fn serial_clk_freq(mut self, serial_clk_freq: SerialClockFrequency) -> Self {
-        self.serial_clk_freq = serial_clk_freq as u8;
+        self.serial_clk_freq = serial_clk_freq;
         self
     }
 
