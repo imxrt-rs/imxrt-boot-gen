@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2.0] - YYYY-MM-DD
+## [0.2.0] - 2020-12-26
 
 **BREAKING** The 0.2 release introduces a `const` API to replace the build-time
 interface. We do not generate data structures in a build script, then write them
