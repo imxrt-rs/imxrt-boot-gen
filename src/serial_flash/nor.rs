@@ -54,8 +54,8 @@ pub struct ConfigurationBlock {
     mem_cfg: flexspi::ConfigurationBlock,
     page_size: u32,
     sector_size: u32,
-    ip_cmd_serial_clk_freq: u32,
-    _reserved: [u8; 52],
+    ip_cmd_serial_clk_freq: SerialClockFrequency,
+    _reserved: [u8; 55],
 }
 
 impl ConfigurationBlock {
@@ -67,8 +67,8 @@ impl ConfigurationBlock {
             mem_cfg,
             page_size: 0,
             sector_size: 0,
-            ip_cmd_serial_clk_freq: 0,
-            _reserved: [0; 52],
+            ip_cmd_serial_clk_freq: SerialClockFrequency::NoChange,
+            _reserved: [0; 55],
         }
     }
     /// Set the serial NOR page size
@@ -86,7 +86,7 @@ impl ConfigurationBlock {
         mut self,
         serial_clock_frequency: SerialClockFrequency,
     ) -> Self {
-        self.ip_cmd_serial_clk_freq = serial_clock_frequency as u32;
+        self.ip_cmd_serial_clk_freq = serial_clock_frequency;
         self
     }
 }
