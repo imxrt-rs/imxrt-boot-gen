@@ -25,6 +25,7 @@ keywords = [
 imxrt1010 = []
 imxrt1060 = []
 imxrt1064 = []
+imxrt1170 = []
 
 [package.metadata.docs.rs]
 features = ["imxrt1060"]

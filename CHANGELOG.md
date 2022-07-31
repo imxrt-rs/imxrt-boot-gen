@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+Add support for the 1170 family.
+
 Fix the `ipCmdSerialClkFreq` field width in the serial NOR flash configuration
 block.
 

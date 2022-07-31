@@ -4,7 +4,7 @@
 use std::env;
 
 // Keep this in sync with the available features
-static SUPPORTED_FEATURES: &[&str] = &["imxrt1010", "imxrt1060", "imxrt1064"];
+static SUPPORTED_FEATURES: &[&str] = &["imxrt1010", "imxrt1060", "imxrt1064", "imxrt1170"];
 
 fn main() {
     let feature_count = SUPPORTED_FEATURES

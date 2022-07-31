@@ -63,13 +63,30 @@ pub use fields::*;
 pub use lookup::{Command, LookupTable};
 pub use sequence::{opcodes, Instr, Pads, Sequence, SequenceBuilder, JUMP_ON_CS, STOP};
 
+/// A version identifier.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(transparent)]
+pub struct Version(u32);
+
+impl Version {
+    /// Construct a version number for your FCB.
+    ///
+    /// Once constructed, pass the version to the configuration block with
+    /// [`ConfigurationBlock::version`](ConfigurationBlock::version).
+    pub const fn new(major: u8, minor: u8, bugfix: u8) -> Version {
+        Version(
+            ((b'V' as u32) << 24) | ((major as u32) << 16) | ((minor as u32) << 8) | bugfix as u32,
+        )
+    }
+}
+
 /// ASCII 'FCFB'
 const TAG: u32 = 0x4246_4346;
-/// [07:00] bugfix = 0
-/// [15:08] minor
-/// [23:16] major = 1
-/// [31:24] ascii ‘V’
-const VERSION: u32 = 0x5601_0000;
+/// The default FCB version used by this library.
+///
+/// Use [`Version::new`](Version::new) to compute your own version identifier.
+pub const VERSION_DEFAULT: Version = Version::new(1, 0, 0);
+const _: () = assert!(VERSION_DEFAULT.0 == 0x5601_0000);
 
 /// The recommended `csHoldTime`, `0x03`.
 ///
@@ -115,13 +132,16 @@ pub const RECOMMENDED_CS_SETUP_TIME: u8 = 0x03;
 #[repr(C, packed)]
 pub struct ConfigurationBlock {
     tag: u32,
-    version: u32,
+    version: Version,
     _reserved0: [u8; 4], // 0x008
     read_sample_clk_src: u8,
     cs_hold_time: u8,
     cs_setup_time: u8,
     column_address_width: u8,
     device_mode_configuration: u8,
+    /// TODO: this isn't reserved on 1170.
+    /// It's "device mode type", with a default value
+    /// of "generic."
     _reserved1: [u8; 1], // 0x011
     wait_time_cfg_commands: WaitTimeConfigurationCommands,
     device_mode_sequence: DeviceModeSequence,
@@ -160,7 +180,7 @@ impl ConfigurationBlock {
     pub const fn new(lookup_table: LookupTable) -> Self {
         ConfigurationBlock {
             tag: TAG,
-            version: VERSION,
+            version: VERSION_DEFAULT,
             read_sample_clk_src: ReadSampleClockSource::InternalLoopback as u8,
             cs_hold_time: RECOMMENDED_CS_HOLD_TIME,
             cs_setup_time: RECOMMENDED_CS_SETUP_TIME,
@@ -198,6 +218,14 @@ impl ConfigurationBlock {
             _reserved5: [0; 8],
             _reserved6: [0; 16],
         }
+    }
+
+    /// Override the version.
+    ///
+    /// The default value is [`VERSION_DEFAULT`].
+    pub const fn version(mut self, version: Version) -> Self {
+        self.version = version;
+        self
     }
 
     /// `readSampleClkSrc`, the clock source for FlexSPI
@@ -290,6 +318,15 @@ impl ConfigurationBlock {
     /// Any region that's not set will default to `0`.
     pub const fn flash_size(mut self, flash_region: SerialFlashRegion, flash_size: u32) -> Self {
         self.serial_flash_sizes[flash_region as usize] = flash_size;
+        self
+    }
+
+    /// Set miscellaneous controller options.
+    ///
+    /// See your chip's reference manual for more information on valid values. This method performs
+    /// no checking on the input.
+    pub const fn controller_misc_options(mut self, options: u32) -> Self {
+        self.controller_misc_options = options;
         self
     }
 }

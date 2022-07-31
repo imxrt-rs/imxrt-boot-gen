@@ -15,6 +15,7 @@ pub enum ReadSampleClockSource {
 pub enum ColumnAddressWidth {
     OtherDevices = 0,
     Hyperflash = 3,
+    // TODO serial NAND flash values 12 and 13 apply to imxrt1170.
 }
 
 /// Sequence parameter for device mode configuration
@@ -97,15 +98,16 @@ pub enum FlashPadType {
 #[repr(u8)]
 pub enum SerialClockFrequency {
     MHz30 = 1,
-    MHz50 = 2,
-    MHz60 = 3,
-    MHz75 = 4,
-    MHz80 = 5,
-    MHz100 = 6,
-    MHz120 = 7,
-    MHz133 = 8,
-    #[cfg(any(feature = "imxrt1060", feature = "imxrt1064"))]
-    MHz166 = 9,
+    MHz50,
+    MHz60,
+    #[cfg(not(feature = "imxrt1170"))]
+    MHz75,
+    MHz80,
+    MHz100,
+    MHz120,
+    MHz133,
+    #[cfg(any(feature = "imxrt1060", feature = "imxrt1064", feature = "imxrt1170"))]
+    MHz166,
 }
 
 /// A FlexSPI serial flash region

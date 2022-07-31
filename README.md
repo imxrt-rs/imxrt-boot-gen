@@ -49,6 +49,7 @@ The supported features are listed below.
 - `"imxrt1010"`
 - `"imxrt1060"`
 - `"imxrt1064"`
+- `"imxrt1170"`
 
 ### License
 

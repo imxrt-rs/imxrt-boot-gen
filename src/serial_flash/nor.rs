@@ -10,20 +10,18 @@ use crate::flexspi;
 pub enum SerialClockFrequency {
     /// No change, keep current serial clock unchanged
     NoChange = 0,
-    MHz30 = 1,
-    MHz50 = 2,
-    MHz60 = 3,
-    MHz75 = 4,
-    MHz80 = 5,
-    MHz100 = 6,
+    MHz30,
+    MHz50,
+    MHz60,
+    #[cfg(not(feature = "imxrt1170"))]
+    MHz75,
+    MHz80,
+    MHz100,
+    #[cfg(any(feature = "imxrt1060", feature = "imxrt1064", feature = "imxrt1170"))]
+    MHz120,
+    MHz133,
     #[cfg(any(feature = "imxrt1060", feature = "imxrt1064"))]
-    MHz120 = 7,
-    #[cfg(feature = "imxrt1010")]
-    MHz133 = 7,
-    #[cfg(any(feature = "imxrt1060", feature = "imxrt1064"))]
-    MHz133 = 8,
-    #[cfg(any(feature = "imxrt1060", feature = "imxrt1064"))]
-    MHz166 = 9,
+    MHz166,
 }
 
 /// A serial NOR configuration block
@@ -34,6 +32,12 @@ pub enum SerialClockFrequency {
 /// script.
 ///
 /// Unless otherwise specified, all unset fields are set to a bitpattern of zero.
+///
+/// ## 1170 notes
+///
+/// By default, `isUniformBlockSize` is set to 1, indicating that the block size and
+/// sector sizes are equal. Using `block_size` clears this field and allows you to
+/// differentiate the block size from the sector size.
 ///
 /// ```no_run
 /// use imxrt_boot_gen::serial_flash::nor;
@@ -55,7 +59,45 @@ pub struct ConfigurationBlock {
     page_size: u32,
     sector_size: u32,
     ip_cmd_serial_clk_freq: SerialClockFrequency,
-    _reserved: [u8; 55],
+    extras: Extras,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[repr(C, packed)]
+struct Imxrt1170Extras {
+    is_uniform_block_size: u8,
+    is_data_order_swapped: u8,
+    _reserved0: [u8; 5],
+    block_size: u32,
+    flash_state_ctx: u32,
+    _reserved1: [u8; 40],
+}
+
+const _: () = assert!(55 == core::mem::size_of::<Imxrt1170Extras>());
+
+#[cfg(feature = "imxrt1170")]
+type Extras = Imxrt1170Extras;
+
+#[cfg(not(feature = "imxrt1170"))]
+type Extras = [u8; core::mem::size_of::<Imxrt1170Extras>()];
+
+const fn extras() -> Extras {
+    #[cfg(feature = "imxrt1170")]
+    {
+        Extras {
+            // By default, signal that block size equals sector size.
+            is_uniform_block_size: 1u8,
+            is_data_order_swapped: 0u8,
+            _reserved0: [0u8; 5],
+            block_size: 0u32,
+            flash_state_ctx: 0u32,
+            _reserved1: [0u8; 40],
+        }
+    }
+    #[cfg(not(feature = "imxrt1170"))]
+    {
+        [0u8; core::mem::size_of::<Imxrt1170Extras>()]
+    }
 }
 
 impl ConfigurationBlock {
@@ -68,7 +110,7 @@ impl ConfigurationBlock {
             page_size: 0,
             sector_size: 0,
             ip_cmd_serial_clk_freq: SerialClockFrequency::NoChange,
-            _reserved: [0; 55],
+            extras: extras(),
         }
     }
     /// Set the serial NOR page size
@@ -87,6 +129,23 @@ impl ConfigurationBlock {
         serial_clock_frequency: SerialClockFrequency,
     ) -> Self {
         self.ip_cmd_serial_clk_freq = serial_clock_frequency;
+        self
+    }
+}
+
+#[cfg(feature = "imxrt1170")]
+impl ConfigurationBlock {
+    /// Set the serial NOR block size if it differs from the sector size.
+    ///
+    /// By default, the configuration block signals to the hardware that the
+    /// sector size is the same as the block size. Calling this will override
+    /// that setting, allowing you to configure a different block size.
+    ///
+    /// The behavior is unspecified if you call this with a block size that's
+    /// equal to the sector size.
+    pub const fn block_size(mut self, block_size: u32) -> Self {
+        self.extras.is_uniform_block_size = 0u8;
+        self.extras.block_size = block_size;
         self
     }
 }
