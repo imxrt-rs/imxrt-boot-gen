@@ -7,13 +7,12 @@ use std::env;
 static SUPPORTED_FEATURES: &[&str] = &["imxrt1010", "imxrt1060", "imxrt1064", "imxrt1170"];
 
 fn main() {
-    let feature_count = SUPPORTED_FEATURES
-        .iter()
-        .cloned()
-        .map(str::to_uppercase)
-        .map(|feature| format!("CARGO_FEATURE_{}", feature))
-        .map(|cargo_feature| env::var(cargo_feature).is_ok() as i32)
-        .sum();
+    let features: Vec<_> = env::vars()
+        .map(|(key, _)| key)
+        .flat_map(|key| key.strip_prefix("CARGO_FEATURE_").map(str::to_lowercase))
+        .collect();
+
+    let feature_count = features.len();
 
     if 0 == feature_count {
         panic!(
@@ -22,7 +21,8 @@ fn main() {
         );
     } else if feature_count > 1 {
         panic!(
-            "Too many features selected! Select one feature from the feature list: {}",
+            "Too many features selected! Detected features {:?}. Select one feature from the feature list: {}",
+            features,
             SUPPORTED_FEATURES.join(" | ")
         );
     }

@@ -1,0 +1,12 @@
+[package]
+name = "imxrt1010evk-fcb"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies.imxrt-boot-gen]
+version = "0.2"
+path = "../.."
+features = ["imxrt1010"]
+
+[lib]
+path = "lib.rs"

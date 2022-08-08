@@ -19,8 +19,6 @@ keywords = [
     "imxrt",
 ]
 
-[dependencies]
-
 [features]
 imxrt1010 = []
 imxrt1060 = []
@@ -30,3 +28,8 @@ imxrt1170 = []
 [package.metadata.docs.rs]
 features = ["imxrt1060"]
 default-target = "thumbv7em-none-eabihf"
+
+[workspace]
+members = [
+    "fcbs/*",
+]
