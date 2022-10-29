@@ -1,13 +1,21 @@
 [package]
 name = "imxrt-boot-gen"
 version = "0.2.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+categories.workspace = true
+keywords.workspace = true
+description = """
+Generate data structures for booting iMXRT processors.
+"""
+
+[workspace.package]
 authors = ["Ian McIntyre <ianpmcintyre@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/imxrt-rs/imxrt-boot-gen"
-description = """
-Generate data structures for booting iMXRT processors.
-"""
 categories = [
     "embedded",
     "hardware-support",
@@ -17,6 +25,7 @@ keywords = [
     "arm",
     "cortex-m",
     "imxrt",
+    "nxp",
 ]
 
 [features]
