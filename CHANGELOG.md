@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+**BREAKING** Update Rust edition to 2021.
+
 Add support for the 1170 family.
 
 Fix the `ipCmdSerialClkFreq` field width in the serial NOR flash configuration
