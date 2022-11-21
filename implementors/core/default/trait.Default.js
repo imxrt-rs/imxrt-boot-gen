@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["imxrt_boot_gen"] = [{"text":"impl Default for DeviceModeSequence","synthetic":false,"types":[]},{"text":"impl Default for DeviceModeConfiguration","synthetic":false,"types":[]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"imxrt_boot_gen":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"struct\" href=\"imxrt_boot_gen/flexspi/struct.DeviceModeSequence.html\" title=\"struct imxrt_boot_gen::flexspi::DeviceModeSequence\">DeviceModeSequence</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"enum\" href=\"imxrt_boot_gen/flexspi/enum.DeviceModeConfiguration.html\" title=\"enum imxrt_boot_gen::flexspi::DeviceModeConfiguration\">DeviceModeConfiguration</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
