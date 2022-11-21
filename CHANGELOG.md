@@ -1,10 +1,12 @@
 # Changelog
 
-## Unreleased
+## [Unreleased]
 
 **BREAKING** Update Rust edition to 2021.
 
 Add support for the 1170 family.
+
+## [0.2.1] - 2022-11-21
 
 Fix the `ipCmdSerialClkFreq` field width in the serial NOR flash configuration
 block.
@@ -136,6 +138,7 @@ static SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
 
 First release
 
-[Unreleased]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/imxrt-rs/imxrt-boot-gen/releases/tag/v0.1.0
