@@ -7,9 +7,10 @@ license.workspace = true
 repository.workspace = true
 categories.workspace = true
 keywords.workspace = true
+description = "FlexSPI configuration block for NXP's IMXRT1010EVK"
 
 [dependencies.imxrt-boot-gen]
-version = "0.2"
+version = "0.3"
 path = "../.."
 features = ["imxrt1010"]
 

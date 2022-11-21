@@ -1,10 +1,17 @@
 # Changelog
 
+This document tracks changes to the `imxrt-boot-gen` package and all other
+packages maintained within this repository.
+
 ## [Unreleased]
+
+## [0.3.0] - 2022-11-21
 
 **BREAKING** Update Rust edition to 2021.
 
 Add support for the 1170 family.
+
+Publish 0.1 FCBs for NXP's IMXRT1010EVK and IMXRT1170EVK.
 
 ## [0.2.1] - 2022-11-21
 
@@ -139,6 +146,7 @@ static SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
 First release
 
 [Unreleased]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.2.1...HEAD
+[0.3.0]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/imxrt-rs/imxrt-boot-gen/releases/tag/v0.1.0
