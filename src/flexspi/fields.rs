@@ -15,7 +15,11 @@ pub enum ReadSampleClockSource {
 pub enum ColumnAddressWidth {
     OtherDevices = 0,
     Hyperflash = 3,
-    // TODO serial NAND flash values 12 and 13 apply to imxrt1170.
+    // TODO serial NAND flash values 12 and 13 apply, at a minimum,
+    // to the following chips:
+    //
+    // - imxrt1020
+    // - imxrt1170
 }
 
 /// Sequence parameter for device mode configuration
@@ -104,9 +108,15 @@ pub enum SerialClockFrequency {
     MHz75,
     MHz80,
     MHz100,
+    #[cfg(not(feature = "imxrt1020"))]
     MHz120,
     MHz133,
-    #[cfg(any(feature = "imxrt1060", feature = "imxrt1064", feature = "imxrt1170"))]
+    #[cfg(any(
+        feature = "imxrt1020",
+        feature = "imxrt1060",
+        feature = "imxrt1064",
+        feature = "imxrt1170"
+    ))]
     MHz166,
 }
 

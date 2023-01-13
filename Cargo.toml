@@ -30,6 +30,7 @@ keywords = [
 
 [features]
 imxrt1010 = []
+imxrt1020 = []
 imxrt1060 = []
 imxrt1064 = []
 imxrt1170 = []

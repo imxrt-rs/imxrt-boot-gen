@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        feature: ["imxrt1010", "imxrt1060", "imxrt1064", "imxrt1170"]
+        feature: ["imxrt1010", "imxrt1020", "imxrt1060", "imxrt1064", "imxrt1170"]
 
     runs-on: ubuntu-latest
 
@@ -20,7 +20,7 @@ jobs:
   clippy:
     strategy:
       matrix:
-        feature: ["imxrt1010", "imxrt1060", "imxrt1170"]
+        feature: ["imxrt1010", "imxrt1020", "imxrt1060", "imxrt1170"]
       
     runs-on: ubuntu-latest
 
