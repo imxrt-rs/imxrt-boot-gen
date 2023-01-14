@@ -469,10 +469,10 @@
     tag: u32,
     version: Version,
     _reserved0: [u8; <span class="number">4</span>], <span class="comment">// 0x008
-    </span>read_sample_clk_src: u8,
+    </span>read_sample_clk_src: ReadSampleClockSource,
     cs_hold_time: u8,
     cs_setup_time: u8,
-    column_address_width: u8,
+    column_address_width: ColumnAddressWidth,
     device_mode_configuration: u8,
     <span class="doccomment">/// TODO: this isn&#39;t reserved on 1170.
     /// It&#39;s &quot;device mode type&quot;, with a default value
@@ -489,7 +489,7 @@
     _reserved4: [u8; <span class="number">4</span>], <span class="comment">// 0x03C
     </span>controller_misc_options: u32,
     <span class="kw">pub</span>(<span class="kw">crate</span>) device_type: u8,
-    serial_flash_pad_type: u8,
+    serial_flash_pad_type: FlashPadType,
     serial_clk_freq: SerialClockFrequency,
     lut_custom_seq_enable: u8,
     _reserved5: [u8; <span class="number">8</span>], <span class="comment">// 0x048
@@ -516,10 +516,10 @@
         ConfigurationBlock {
             tag: TAG,
             version: VERSION_DEFAULT,
-            read_sample_clk_src: ReadSampleClockSource::InternalLoopback <span class="kw">as </span>u8,
+            read_sample_clk_src: ReadSampleClockSource::InternalLoopback,
             cs_hold_time: RECOMMENDED_CS_HOLD_TIME,
             cs_setup_time: RECOMMENDED_CS_SETUP_TIME,
-            column_address_width: ColumnAddressWidth::OtherDevices <span class="kw">as </span>u8,
+            column_address_width: ColumnAddressWidth::OtherDevices,
             device_mode_configuration: <span class="number">0</span>, <span class="comment">// Disabled
             </span>wait_time_cfg_commands: WaitTimeConfigurationCommands::disable(),
             device_mode_sequence: DeviceModeSequence::new(<span class="number">0</span>, <span class="number">0</span>),
@@ -529,9 +529,9 @@
             cfg_cmd_args: [<span class="number">0</span>; <span class="number">12</span>],
             controller_misc_options: <span class="number">0</span>,
             device_type: <span class="number">0</span>, <span class="comment">// Invalid value; must be updated in NOR / NAND configuration block
-            </span>serial_flash_pad_type: <span class="number">1</span>, <span class="comment">// Single pad
-            </span>serial_clk_freq: SerialClockFrequency::MHz30, <span class="comment">// 30MHz
-            </span>lut_custom_seq_enable: <span class="number">0</span>,
+            </span>serial_flash_pad_type: FlashPadType::Single,
+            serial_clk_freq: SerialClockFrequency::MHz30,
+            lut_custom_seq_enable: <span class="number">0</span>,
             serial_flash_sizes: [<span class="number">0</span>; <span class="number">4</span>],
             cs_pad_setting_override: <span class="number">0</span>,
             sclk_pad_setting_override: <span class="number">0</span>,
@@ -567,7 +567,7 @@
     ///
     /// If not set, this defaults to `ReadSampleClockSource::InternalLoopback`.
     </span><span class="kw">pub const fn </span>read_sample_clk_src(<span class="kw-2">mut </span><span class="self">self</span>, read_sample_clk_src: ReadSampleClockSource) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.read_sample_clk_src = read_sample_clk_src <span class="kw">as </span>u8;
+        <span class="self">self</span>.read_sample_clk_src = read_sample_clk_src;
         <span class="self">self
     </span>}
 
@@ -591,7 +591,7 @@
     ///
     /// If not set, this defaults to `ColumnAddressWidth::OtherDevices`
     </span><span class="kw">pub const fn </span>column_address_width(<span class="kw-2">mut </span><span class="self">self</span>, column_address_width: ColumnAddressWidth) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.column_address_width = column_address_width <span class="kw">as </span>u8;
+        <span class="self">self</span>.column_address_width = column_address_width;
         <span class="self">self
     </span>}
 
@@ -636,7 +636,7 @@
     ///
     /// If not set, this defaults to `FlashPadType::Single`.
     </span><span class="kw">pub const fn </span>serial_flash_pad_type(<span class="kw-2">mut </span><span class="self">self</span>, serial_flash_pad_type: FlashPadType) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.serial_flash_pad_type = serial_flash_pad_type <span class="kw">as </span>u8;
+        <span class="self">self</span>.serial_flash_pad_type = serial_flash_pad_type;
         <span class="self">self
     </span>}
 
