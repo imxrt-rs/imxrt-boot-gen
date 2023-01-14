@@ -5,6 +5,10 @@ packages maintained within this repository.
 
 ## [Unreleased]
 
+## [0.3.1] - 2023-01-14
+
+Add support for the 1020 family.
+
 ## [0.3.0] - 2022-11-21
 
 **BREAKING** Update Rust edition to 2021.
