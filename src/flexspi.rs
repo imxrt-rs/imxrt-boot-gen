@@ -134,10 +134,10 @@ pub struct ConfigurationBlock {
     tag: u32,
     version: Version,
     _reserved0: [u8; 4], // 0x008
-    read_sample_clk_src: u8,
+    read_sample_clk_src: ReadSampleClockSource,
     cs_hold_time: u8,
     cs_setup_time: u8,
-    column_address_width: u8,
+    column_address_width: ColumnAddressWidth,
     device_mode_configuration: u8,
     /// TODO: this isn't reserved on 1170.
     /// It's "device mode type", with a default value
@@ -154,7 +154,7 @@ pub struct ConfigurationBlock {
     _reserved4: [u8; 4], // 0x03C
     controller_misc_options: u32,
     pub(crate) device_type: u8,
-    serial_flash_pad_type: u8,
+    serial_flash_pad_type: FlashPadType,
     serial_clk_freq: SerialClockFrequency,
     lut_custom_seq_enable: u8,
     _reserved5: [u8; 8], // 0x048
@@ -181,10 +181,10 @@ impl ConfigurationBlock {
         ConfigurationBlock {
             tag: TAG,
             version: VERSION_DEFAULT,
-            read_sample_clk_src: ReadSampleClockSource::InternalLoopback as u8,
+            read_sample_clk_src: ReadSampleClockSource::InternalLoopback,
             cs_hold_time: RECOMMENDED_CS_HOLD_TIME,
             cs_setup_time: RECOMMENDED_CS_SETUP_TIME,
-            column_address_width: ColumnAddressWidth::OtherDevices as u8,
+            column_address_width: ColumnAddressWidth::OtherDevices,
             device_mode_configuration: 0, // Disabled
             wait_time_cfg_commands: WaitTimeConfigurationCommands::disable(),
             device_mode_sequence: DeviceModeSequence::new(0, 0),
@@ -194,8 +194,8 @@ impl ConfigurationBlock {
             cfg_cmd_args: [0; 12],
             controller_misc_options: 0,
             device_type: 0, // Invalid value; must be updated in NOR / NAND configuration block
-            serial_flash_pad_type: 1, // Single pad
-            serial_clk_freq: SerialClockFrequency::MHz30, // 30MHz
+            serial_flash_pad_type: FlashPadType::Single,
+            serial_clk_freq: SerialClockFrequency::MHz30,
             lut_custom_seq_enable: 0,
             serial_flash_sizes: [0; 4],
             cs_pad_setting_override: 0,
@@ -232,7 +232,7 @@ impl ConfigurationBlock {
     ///
     /// If not set, this defaults to `ReadSampleClockSource::InternalLoopback`.
     pub const fn read_sample_clk_src(mut self, read_sample_clk_src: ReadSampleClockSource) -> Self {
-        self.read_sample_clk_src = read_sample_clk_src as u8;
+        self.read_sample_clk_src = read_sample_clk_src;
         self
     }
 
@@ -256,7 +256,7 @@ impl ConfigurationBlock {
     ///
     /// If not set, this defaults to `ColumnAddressWidth::OtherDevices`
     pub const fn column_address_width(mut self, column_address_width: ColumnAddressWidth) -> Self {
-        self.column_address_width = column_address_width as u8;
+        self.column_address_width = column_address_width;
         self
     }
 
@@ -301,7 +301,7 @@ impl ConfigurationBlock {
     ///
     /// If not set, this defaults to `FlashPadType::Single`.
     pub const fn serial_flash_pad_type(mut self, serial_flash_pad_type: FlashPadType) -> Self {
-        self.serial_flash_pad_type = serial_flash_pad_type as u8;
+        self.serial_flash_pad_type = serial_flash_pad_type;
         self
     }
 
