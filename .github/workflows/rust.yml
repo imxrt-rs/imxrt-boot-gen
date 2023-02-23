@@ -47,7 +47,7 @@ jobs:
   fcbs:
     strategy:
       matrix:
-        fcb: ["imxrt1010evk-fcb", "imxrt1170evk-fcb"]
+        fcb: ["imxrt1010evk-fcb", "imxrt1060evk-fcb", "imxrt1170evk-fcb"]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
