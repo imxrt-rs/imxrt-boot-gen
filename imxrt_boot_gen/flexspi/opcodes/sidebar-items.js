@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["ddr","Dual data transfer rate (DDR) opcodes"],["sdr","Single data transfer rate (SDR) opcodes"]]};
+window.SIDEBAR_ITEMS = {"mod":["ddr","sdr"]};
