@@ -20,7 +20,7 @@ pub enum SerialClockFrequency {
     #[cfg(any(feature = "imxrt1060", feature = "imxrt1064", feature = "imxrt1170"))]
     MHz120,
     MHz133,
-    #[cfg(any(feature = "imxrt1060", feature = "imxrt1064"))]
+    #[cfg(any(feature = "imxrt1050", feature = "imxrt1060", feature = "imxrt1064"))]
     MHz166,
 }
 

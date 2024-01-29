@@ -5,6 +5,8 @@ packages maintained within this repository.
 
 ## [Unreleased]
 
+Add support for the 1050 family.
+
 ## [0.3.1] - 2023-01-14
 
 Add support for the 1020 family.
