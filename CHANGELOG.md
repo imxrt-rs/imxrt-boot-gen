@@ -5,6 +5,8 @@ packages maintained within this repository.
 
 ## [Unreleased]
 
+## [0.3.2] - 2024-02-01
+
 Add support for the 1050 family.
 
 ## [0.3.1] - 2023-01-14
@@ -152,6 +154,8 @@ static SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
 First release
 
 [Unreleased]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.2.1...HEAD
+[0.3.2]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.1...v0.3.2
+[0.3.1]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.1.0...v0.2.0
