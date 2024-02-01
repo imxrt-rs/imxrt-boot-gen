@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/flexspi.rs`."><title>flexspi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../../static.files/ayu-be46fdc453a55015.css"><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../imxrt_boot_gen/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/flexspi.rs`."><title>flexspi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="imxrt_boot_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (11f32b73e 2024-01-31)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../imxrt_boot_gen/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -333,7 +335,8 @@
 <a href="#333" id="333">333</a>
 <a href="#334" id="334">334</a>
 <a href="#335" id="335">335</a>
-</pre><pre class="rust"><code><span class="doccomment">//! FlexSPI configuration block definitions
+<a href="#336" id="336">336</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! FlexSPI configuration block definitions
 //!
 //! The FlexSPI module includes
 //!
@@ -386,7 +389,7 @@
 //!
 //! # FlexSPI Configuration Block
 //!
-//! Once you&#39;ve created your sequences and lookup table, use the lookup table to create
+//! Once you've created your sequences and lookup table, use the lookup table to create
 //! a [`ConfigurationBlock`]. See the `ConfigurationBlock` documentation
 //! for more information.
 
@@ -410,18 +413,19 @@
     /// [`ConfigurationBlock::version`](ConfigurationBlock::version).
     </span><span class="kw">pub const fn </span>new(major: u8, minor: u8, bugfix: u8) -&gt; Version {
         Version(
-            ((<span class="string">b&#39;V&#39; </span><span class="kw">as </span>u32) &lt;&lt; <span class="number">24</span>) | ((major <span class="kw">as </span>u32) &lt;&lt; <span class="number">16</span>) | ((minor <span class="kw">as </span>u32) &lt;&lt; <span class="number">8</span>) | bugfix <span class="kw">as </span>u32,
+            ((<span class="string">b'V' </span><span class="kw">as </span>u32) &lt;&lt; <span class="number">24</span>) | ((major <span class="kw">as </span>u32) &lt;&lt; <span class="number">16</span>) | ((minor <span class="kw">as </span>u32) &lt;&lt; <span class="number">8</span>) | bugfix <span class="kw">as </span>u32,
         )
     }
 }
 
-<span class="doccomment">/// ASCII &#39;FCFB&#39;
+<span class="doccomment">/// ASCII 'FCFB'
 </span><span class="kw">const </span>TAG: u32 = <span class="number">0x4246_4346</span>;
 <span class="doccomment">/// The default FCB version used by this library.
 ///
 /// Use [`Version::new`](Version::new) to compute your own version identifier.
 </span><span class="kw">pub const </span>VERSION_DEFAULT: Version = Version::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>);
-<span class="kw">const _</span>: () = <span class="macro">assert!</span>(VERSION_DEFAULT.<span class="number">0 </span>== <span class="number">0x5601_0000</span>);
+<span class="attr">#[allow(clippy::assertions_on_constants)] </span><span class="comment">// Sanity check.
+</span><span class="kw">const _</span>: () = <span class="macro">assert!</span>(VERSION_DEFAULT.<span class="number">0 </span>== <span class="number">0x5601_0000</span>);
 
 <span class="doccomment">/// The recommended `csHoldTime`, `0x03`.
 ///
@@ -474,9 +478,9 @@
     cs_setup_time: u8,
     column_address_width: ColumnAddressWidth,
     device_mode_configuration: u8,
-    <span class="doccomment">/// TODO: this isn&#39;t reserved on 1170.
-    /// It&#39;s &quot;device mode type&quot;, with a default value
-    /// of &quot;generic.&quot;
+    <span class="doccomment">/// TODO: this isn't reserved on 1170.
+    /// It's "device mode type", with a default value
+    /// of "generic."
     </span>_reserved1: [u8; <span class="number">1</span>], <span class="comment">// 0x011
     </span>wait_time_cfg_commands: WaitTimeConfigurationCommands,
     device_mode_sequence: DeviceModeSequence,
@@ -596,8 +600,8 @@
     </span>}
 
     <span class="doccomment">/// Sets device configuration mode. The `DeviceModeConfiguration::Disabled` variant
-    /// will set `deviceModeCfgEnable` to &quot;disabled&quot;. Otherwise, we will set
-    /// `deviceModeCfgEnable` to &quot;enabled,&quot; and we use the sequence and argument
+    /// will set `deviceModeCfgEnable` to "disabled". Otherwise, we will set
+    /// `deviceModeCfgEnable` to "enabled," and we use the sequence and argument
     /// parameters in the FCB.
     ///
     /// If not set, this defaults to `DeviceModeConfiguration::Disabled`.
@@ -650,7 +654,7 @@
 
     <span class="doccomment">/// Set a flash size for the provided flash region
     ///
-    /// Any region that&#39;s not set will default to `0`.
+    /// Any region that's not set will default to `0`.
     </span><span class="kw">pub const fn </span>flash_size(<span class="kw-2">mut </span><span class="self">self</span>, flash_region: SerialFlashRegion, flash_size: u32) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.serial_flash_sizes[flash_region <span class="kw">as </span>usize] = flash_size;
         <span class="self">self
@@ -658,7 +662,7 @@
 
     <span class="doccomment">/// Set miscellaneous controller options.
     ///
-    /// See your chip&#39;s reference manual for more information on valid values. This method performs
+    /// See your chip's reference manual for more information on valid values. This method performs
     /// no checking on the input.
     </span><span class="kw">pub const fn </span>controller_misc_options(<span class="kw-2">mut </span><span class="self">self</span>, options: u32) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.controller_misc_options = options;
@@ -668,5 +672,4 @@
 
 <span class="kw">const </span>_STATIC_ASSERT_SIZE: [u32; <span class="number">1</span>] =
     [<span class="number">0</span>; (core::mem::size_of::&lt;ConfigurationBlock&gt;() == <span class="number">448</span>) <span class="kw">as </span>usize];
-</code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="imxrt_boot_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (44cfafe2f 2023-03-03)" data-search-js="search-894761433ba8c506.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</code></pre></div></section></main></body></html>
