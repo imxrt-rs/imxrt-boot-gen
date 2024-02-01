@@ -86,6 +86,7 @@ const TAG: u32 = 0x4246_4346;
 ///
 /// Use [`Version::new`](Version::new) to compute your own version identifier.
 pub const VERSION_DEFAULT: Version = Version::new(1, 0, 0);
+#[allow(clippy::assertions_on_constants)] // Sanity check.
 const _: () = assert!(VERSION_DEFAULT.0 == 0x5601_0000);
 
 /// The recommended `csHoldTime`, `0x03`.

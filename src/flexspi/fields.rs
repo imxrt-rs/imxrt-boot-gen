@@ -41,9 +41,10 @@ impl DeviceModeSequence {
 /// Describes both the `deviceModeCfgEnable` field, and
 /// the `deviceModeArg` field, which is only valid if
 /// the configuration is enabled.
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Default)]
 pub enum DeviceModeConfiguration {
     /// Device configuration mode is disabled
+    #[default]
     Disabled,
     /// Device configuration mode is enabled
     ///
@@ -54,12 +55,6 @@ pub enum DeviceModeConfiguration {
         /// `deviceModeSeq`
         device_mode_seq: DeviceModeSequence,
     },
-}
-
-impl Default for DeviceModeConfiguration {
-    fn default() -> Self {
-        DeviceModeConfiguration::Disabled
-    }
 }
 
 /// Wait time for all configuration commands
