@@ -1,0 +1,18 @@
+[package]
+name = "imxrt1180evk-fcb"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+categories.workspace = true
+keywords.workspace = true
+description = "FlexSPI configuration block for NXP's IMXRT1180EVK"
+
+[dependencies.imxrt-boot-gen]
+version = "0.3"
+path = "../.."
+features = ["imxrt1180"]
+
+[lib]
+path = "lib.rs"

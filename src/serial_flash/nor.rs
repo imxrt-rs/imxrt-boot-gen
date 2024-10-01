@@ -13,11 +13,16 @@ pub enum SerialClockFrequency {
     MHz30,
     MHz50,
     MHz60,
-    #[cfg(not(feature = "imxrt1170"))]
+    #[cfg(not(any(feature = "imxrt1170", feature = "imxrt1180")))]
     MHz75,
     MHz80,
     MHz100,
-    #[cfg(any(feature = "imxrt1060", feature = "imxrt1064", feature = "imxrt1170"))]
+    #[cfg(any(
+        feature = "imxrt1060",
+        feature = "imxrt1064",
+        feature = "imxrt1170",
+        feature = "imxrt1180"
+    ))]
     MHz120,
     MHz133,
     #[cfg(any(feature = "imxrt1050", feature = "imxrt1060", feature = "imxrt1064"))]
@@ -64,7 +69,7 @@ pub struct ConfigurationBlock {
 
 #[derive(Debug, Clone, Copy)]
 #[repr(C, packed)]
-struct Imxrt1170Extras {
+struct Imxrt11xxExtras {
     is_uniform_block_size: u8,
     is_data_order_swapped: u8,
     _reserved0: [u8; 5],
@@ -73,16 +78,16 @@ struct Imxrt1170Extras {
     _reserved1: [u8; 40],
 }
 
-const _: () = assert!(55 == core::mem::size_of::<Imxrt1170Extras>());
+const _: () = assert!(55 == core::mem::size_of::<Imxrt11xxExtras>());
 
-#[cfg(feature = "imxrt1170")]
-type Extras = Imxrt1170Extras;
+#[cfg(any(feature = "imxrt1170", feature = "imxrt1180"))]
+type Extras = Imxrt11xxExtras;
 
-#[cfg(not(feature = "imxrt1170"))]
-type Extras = [u8; core::mem::size_of::<Imxrt1170Extras>()];
+#[cfg(not(any(feature = "imxrt1170", feature = "imxrt1180")))]
+type Extras = [u8; core::mem::size_of::<Imxrt11xxExtras>()];
 
 const fn extras() -> Extras {
-    #[cfg(feature = "imxrt1170")]
+    #[cfg(any(feature = "imxrt1170", feature = "imxrt1180"))]
     {
         Extras {
             // By default, signal that block size equals sector size.
@@ -94,9 +99,9 @@ const fn extras() -> Extras {
             _reserved1: [0u8; 40],
         }
     }
-    #[cfg(not(feature = "imxrt1170"))]
+    #[cfg(not(any(feature = "imxrt1170", feature = "imxrt1180")))]
     {
-        [0u8; core::mem::size_of::<Imxrt1170Extras>()]
+        [0u8; core::mem::size_of::<Imxrt11xxExtras>()]
     }
 }
 
@@ -133,7 +138,7 @@ impl ConfigurationBlock {
     }
 }
 
-#[cfg(feature = "imxrt1170")]
+#[cfg(any(feature = "imxrt1170", feature = "imxrt1180"))]
 impl ConfigurationBlock {
     /// Set the serial NOR block size if it differs from the sector size.
     ///

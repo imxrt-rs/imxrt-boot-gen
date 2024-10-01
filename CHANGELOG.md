@@ -5,6 +5,8 @@ packages maintained within this repository.
 
 ## [Unreleased]
 
+Add support for the 1180 family
+
 ## [0.3.2] - 2024-02-01
 
 Add support for the 1050 family.

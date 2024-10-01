@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        feature: ["imxrt1010", "imxrt1020", "imxrt1050", "imxrt1060", "imxrt1064", "imxrt1170"]
+        feature: ["imxrt1010", "imxrt1020", "imxrt1050", "imxrt1060", "imxrt1064", "imxrt1170", "imxrt1180"]
 
     runs-on: ubuntu-latest
 
@@ -20,7 +20,7 @@ jobs:
   clippy:
     strategy:
       matrix:
-        feature: ["imxrt1010", "imxrt1020", "imxrt1050", "imxrt1060", "imxrt1170"]
+        feature: ["imxrt1010", "imxrt1020", "imxrt1050", "imxrt1060", "imxrt1170", "imxrt1180"]
       
     runs-on: ubuntu-latest
 
@@ -47,7 +47,7 @@ jobs:
   fcbs:
     strategy:
       matrix:
-        fcb: ["imxrt1010evk-fcb", "imxrt1060evk-fcb", "imxrt1170evk-fcb"]
+        fcb: ["imxrt1010evk-fcb", "imxrt1060evk-fcb", "imxrt1170evk-fcb", "imxrt1180evk-fcb"]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2

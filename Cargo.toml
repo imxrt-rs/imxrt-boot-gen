@@ -35,6 +35,7 @@ imxrt1050 = []
 imxrt1060 = []
 imxrt1064 = []
 imxrt1170 = []
+imxrt1180 = []
 
 [package.metadata.docs.rs]
 features = ["imxrt1060"]
