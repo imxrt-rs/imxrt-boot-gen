@@ -96,6 +96,12 @@ pub struct SequenceBuilder {
     offset: usize,
 }
 
+impl Default for SequenceBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SequenceBuilder {
     /// Creates a new `SequenceBuilder` than can accept up to eight instructions
     ///

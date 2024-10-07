@@ -50,6 +50,12 @@ const NUMBER_OF_SEQUENCES: usize = LOOKUP_TABLE_SIZE_BYTES / SEQUENCE_SIZE;
 #[repr(transparent)]
 pub struct LookupTable([Sequence; NUMBER_OF_SEQUENCES]);
 
+impl Default for LookupTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LookupTable {
     /// Create a new lookup table. All memory is set to zero.
     pub const fn new() -> Self {

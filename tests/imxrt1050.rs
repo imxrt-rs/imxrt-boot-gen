@@ -1,6 +1,6 @@
 //! Tests specific to 1050 family.
 
-#![cfg(any(feature = "imxrt1050"))]
+#![cfg(feature = "imxrt1050")]
 
 #[test]
 fn serial_clock_frequency() {
