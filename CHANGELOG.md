@@ -5,6 +5,10 @@ packages maintained within this repository.
 
 ## [Unreleased]
 
+Add support for new MCUS:
+
+- 1040
+
 ## [0.3.3] - 2024-10-26
 
 Add support for the 1180 family

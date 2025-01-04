@@ -7,6 +7,7 @@ use std::env;
 static SUPPORTED_FEATURES: &[&str] = &[
     "imxrt1010",
     "imxrt1020",
+    "imxrt1040",
     "imxrt1050",
     "imxrt1060",
     "imxrt1064",
