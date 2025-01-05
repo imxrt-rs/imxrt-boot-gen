@@ -13,7 +13,7 @@ pub enum SerialClockFrequency {
     MHz30,
     MHz50,
     MHz60,
-    #[cfg(not(any(feature = "imxrt1170", feature = "imxrt1180")))]
+    #[cfg(not(any(feature = "imxrt1160", feature = "imxrt1170", feature = "imxrt1180")))]
     MHz75,
     MHz80,
     MHz100,
@@ -21,6 +21,7 @@ pub enum SerialClockFrequency {
         feature = "imxrt1040",
         feature = "imxrt1060",
         feature = "imxrt1064",
+        feature = "imxrt1160",
         feature = "imxrt1170",
         feature = "imxrt1180"
     ))]
@@ -86,14 +87,14 @@ struct Imxrt11xxExtras {
 
 const _: () = assert!(55 == core::mem::size_of::<Imxrt11xxExtras>());
 
-#[cfg(any(feature = "imxrt1170", feature = "imxrt1180"))]
+#[cfg(any(feature = "imxrt1160", feature = "imxrt1170", feature = "imxrt1180"))]
 type Extras = Imxrt11xxExtras;
 
-#[cfg(not(any(feature = "imxrt1170", feature = "imxrt1180")))]
+#[cfg(not(any(feature = "imxrt1160", feature = "imxrt1170", feature = "imxrt1180")))]
 type Extras = [u8; core::mem::size_of::<Imxrt11xxExtras>()];
 
 const fn extras() -> Extras {
-    #[cfg(any(feature = "imxrt1170", feature = "imxrt1180"))]
+    #[cfg(any(feature = "imxrt1160", feature = "imxrt1170", feature = "imxrt1180"))]
     {
         Extras {
             // By default, signal that block size equals sector size.
@@ -105,7 +106,7 @@ const fn extras() -> Extras {
             _reserved1: [0u8; 40],
         }
     }
-    #[cfg(not(any(feature = "imxrt1170", feature = "imxrt1180")))]
+    #[cfg(not(any(feature = "imxrt1160", feature = "imxrt1170", feature = "imxrt1180")))]
     {
         [0u8; core::mem::size_of::<Imxrt11xxExtras>()]
     }
@@ -144,7 +145,7 @@ impl ConfigurationBlock {
     }
 }
 
-#[cfg(any(feature = "imxrt1170", feature = "imxrt1180"))]
+#[cfg(any(feature = "imxrt1160", feature = "imxrt1170", feature = "imxrt1180"))]
 impl ConfigurationBlock {
     /// Set the serial NOR block size if it differs from the sector size.
     ///

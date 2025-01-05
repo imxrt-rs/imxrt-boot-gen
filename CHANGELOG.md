@@ -8,6 +8,7 @@ packages maintained within this repository.
 Add support for new MCUS:
 
 - 1040
+- 1160
 
 ## [0.3.3] - 2024-10-26
 

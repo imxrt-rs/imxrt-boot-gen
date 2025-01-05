@@ -11,6 +11,7 @@ static SUPPORTED_FEATURES: &[&str] = &[
     "imxrt1050",
     "imxrt1060",
     "imxrt1064",
+    "imxrt1160",
     "imxrt1170",
     "imxrt1180",
 ];
