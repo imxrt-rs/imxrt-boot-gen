@@ -11,11 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+    - run: rustup toolchain install stable --no-self-update --profile minimal
     - name: Build (${{ matrix.feature }})
-      run: cargo build --package=imxrt-boot-gen --verbose --features=${{ matrix.feature }}
+      run: cargo build --package=imxrt-boot-gen --features=${{ matrix.feature }}
     - name: Run tests (${{ matrix.feature }})
-      run: cargo test --package=imxrt-boot-gen --verbose --features=${{ matrix.feature }}
+      run: cargo test --package=imxrt-boot-gen --features=${{ matrix.feature }}
   
   clippy:
     strategy:
@@ -25,24 +26,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - run: rustup component add clippy
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --package=imxrt-boot-gen --features=${{ matrix.feature }} -- -D warnings
-          name: Run clippy (${{ matrix.feature }})
+      - uses: actions/checkout@v4
+      - run: rustup toolchain install stable --no-self-update --profile minimal --component clippy
+      - run: cargo clippy --package=imxrt-boot-gen --features=${{ matrix.feature }} -- -D warnings
 
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: rustup component add rustfmt
+      - uses: actions/checkout@v4
+      - run: rustup toolchain install stable --no-self-update --profile minimal --component rustfmt
       - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+        run: cargo fmt --all -- --check
 
   fcbs:
     strategy:
@@ -50,17 +44,11 @@ jobs:
         fcb: ["imxrt1010evk-fcb", "imxrt1060evk-fcb", "imxrt1170evk-fcb", "imxrt1180evk-fcb"]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        target: thumbv7em-none-eabihf
+    - uses: actions/checkout@v4
+    - run: rustup toolchain install stable --no-self-update --profile minimal --target thumbv7em-none-eabihf --component clippy
     - name: Build for an embedded target
       run: cargo build --package=${{ matrix.fcb }} --verbose --target=thumbv7em-none-eabihf
     - name: Build and run tests on the host
       run: cargo test --package=${{ matrix.fcb }} --verbose
-    - uses: actions-rs/clippy-check@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        args: --package=${{ matrix.fcb }} -- -D warnings
-        name: Lint the package
+    - name: Lint the package
+      run: cargo clippy --package=${{ matrix.fcb }} --target=thumbv7em-none-eabihf -- -D warnings
