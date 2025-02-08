@@ -62,8 +62,15 @@ impl LookupTable {
         LookupTable([Sequence::stopped(); NUMBER_OF_SEQUENCES])
     }
     /// Assign the `sequence` to the command that is found at the `Command` index
-    pub const fn command(mut self, cmd: Command, sequence: Sequence) -> Self {
-        self.0[cmd as usize] = sequence;
+    pub const fn command(self, cmd: Command, sequence: Sequence) -> Self {
+        self.custom_command(cmd as _, sequence)
+    }
+    /// Assign a sequence to one of the freely-available LUT indexes.
+    ///
+    /// You're responsible for making sure this doesn't accidentally
+    /// overwrite one of the standard [`Command`] sequences.
+    pub const fn custom_command(mut self, index: usize, sequence: Sequence) -> Self {
+        self.0[index] = sequence;
         self
     }
 }

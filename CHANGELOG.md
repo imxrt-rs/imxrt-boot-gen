@@ -12,6 +12,8 @@ Add support for new MCUS:
 
 Expose configuration commands in the common FlexSPI configuration block.
 
+Add support for custom sequences in the FCB LUT.
+
 ## [0.3.3] - 2024-10-26
 
 Add support for the 1180 family
