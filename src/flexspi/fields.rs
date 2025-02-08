@@ -24,19 +24,36 @@ pub enum ColumnAddressWidth {
 
 /// Sequence parameter for device mode configuration
 #[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
-#[repr(transparent)]
-pub struct DeviceModeSequence([u8; 4]);
+#[repr(C, packed)]
+pub struct DeviceModeSequence {
+    /// How many sequences are needed
+    /// to execute the command?
+    sequence_count: u8,
+    /// Where do we start in the LUT?
+    sequence_index: u8,
+    _reserved: u16,
+}
+
 impl DeviceModeSequence {
     /// Create a new sequence parameter for device configuration
     ///
-    /// `starting_lut_index`: starting LUT index of Device mode configuration command
-    /// `number_of_luts`: number of LUT sequences for Device mode configuration command
-    pub const fn new(number_of_luts: u8, starting_lut_index: u8) -> Self {
-        DeviceModeSequence(
-            (((starting_lut_index as u32) << 8) | (number_of_luts as u32)).to_le_bytes(),
-        )
+    /// `sequence_index`: starting LUT index of Device mode configuration command
+    /// `sequence_count`: number of LUT sequences for Device mode configuration command
+    pub const fn new(sequence_count: u8, sequence_index: u8) -> Self {
+        Self {
+            sequence_count,
+            sequence_index,
+            _reserved: 0,
+        }
+    }
+
+    pub(crate) const fn zeroed() -> Self {
+        Self::new(0, 0)
     }
 }
+
+/// Configuration commands to augment LUT sequences.
+pub type ConfigurationCommand = DeviceModeSequence;
 
 /// Describes both the `deviceModeCfgEnable` field, and
 /// the `deviceModeArg` field, which is only valid if

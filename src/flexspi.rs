@@ -124,6 +124,7 @@ pub const RECOMMENDED_CS_SETUP_TIME: u8 = 0x03;
 ///         .cs_setup_time(0x02)
 ///         .column_address_width(ColumnAddressWidth::OtherDevices)
 ///         .device_mode_configuration(DeviceModeConfiguration::Disabled)
+///         .configuration_command(2, ConfigurationCommand::new(1, 12), 42)
 ///         .wait_time_cfg_commands(WaitTimeConfigurationCommands::new(40_000))
 ///         .flash_size(SerialFlashRegion::A1, 0x0020_0000)
 ///         .serial_clk_freq(SerialClockFrequency::MHz60)
@@ -149,9 +150,9 @@ pub struct ConfigurationBlock {
     device_mode_arg: u32,
     config_cmd_enable: u8,
     _reserved2: [u8; 3], // 0x01D
-    config_cmd_seqs: [u8; 12],
+    config_cmd_seqs: [ConfigurationCommand; 3],
     _reserved3: [u8; 4], // 0x02C
-    cfg_cmd_args: [u8; 12],
+    cfg_cmd_args: [u32; 3],
     _reserved4: [u8; 4], // 0x03C
     controller_misc_options: u32,
     pub(crate) device_type: u8,
@@ -188,11 +189,11 @@ impl ConfigurationBlock {
             column_address_width: ColumnAddressWidth::OtherDevices,
             device_mode_configuration: 0, // Disabled
             wait_time_cfg_commands: WaitTimeConfigurationCommands::disable(),
-            device_mode_sequence: DeviceModeSequence::new(0, 0),
+            device_mode_sequence: DeviceModeSequence::zeroed(),
             device_mode_arg: 0,
             config_cmd_enable: 0,
-            config_cmd_seqs: [0; 12],
-            cfg_cmd_args: [0; 12],
+            config_cmd_seqs: [ConfigurationCommand::zeroed(); 3],
+            cfg_cmd_args: [0; 3],
             controller_misc_options: 0,
             device_type: 0, // Invalid value; must be updated in NOR / NAND configuration block
             serial_flash_pad_type: FlashPadType::Single,
@@ -284,6 +285,31 @@ impl ConfigurationBlock {
                 self.device_mode_arg = device_mode_arg;
             }
         }
+        self
+    }
+
+    /// Set a configuration command.
+    ///
+    /// If this is ever called, it automatically enables configuration commands.
+    /// There is no way to clear the enable flag, even if you were to override it
+    /// with zero-initialized `config_command`s.
+    ///
+    /// If your boot ROM supports it, you can use this to augment flash part setup,
+    /// such as setting read parameters.
+    ///
+    /// # Panics
+    ///
+    /// There are only three configuration commands. Panics if `index` is anything
+    /// other than 0, 1, or 2.
+    pub const fn configuration_command(
+        mut self,
+        index: usize,
+        config_command: ConfigurationCommand,
+        config_arg: u32,
+    ) -> Self {
+        self.config_cmd_enable = 1;
+        self.config_cmd_seqs[index] = config_command;
+        self.cfg_cmd_args[index] = config_arg;
         self
     }
 
