@@ -5,6 +5,8 @@ packages maintained within this repository.
 
 ## [Unreleased]
 
+## [0.3.4] 2025-03-01
+
 Add support for new MCUS:
 
 - 1040
@@ -167,6 +169,7 @@ static SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
 First release
 
 [Unreleased]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.0...HEAD
+[0.3.4]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.0...v0.3.1
