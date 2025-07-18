@@ -39,7 +39,7 @@ impl Instr {
 impl fmt::Debug for Instr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let raw = u16::from_le_bytes(self.0);
-        write!(f, "{:#02X}", raw)
+        write!(f, "{raw:#02X}")
     }
 }
 
@@ -157,7 +157,7 @@ impl fmt::Display for Pads {
             Pads::Four => "QUAD",
             Pads::Eight => "OCTAL",
         };
-        write!(f, "{}", pads)
+        write!(f, "{pads}")
     }
 }
 
