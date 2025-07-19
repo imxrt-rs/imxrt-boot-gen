@@ -1,4 +1,4 @@
-//! FlexSPI configuration block (FCB) for the iMXRT1170EVK.
+//! FlexSPI configuration block (FCB) for the VMU RT1170 Drone Control Board.
 //!
 //! This FCB is compatible with thei Macronix MX25UM51345GXDI00 Hyperflash (Octal SPI) storage found on the
 //! VMU RT1170. However, it only supports reads.
