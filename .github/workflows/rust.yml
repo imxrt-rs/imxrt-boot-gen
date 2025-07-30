@@ -4,31 +4,25 @@ on: [push, pull_request]
 
 jobs:
   build:
-    strategy:
-      matrix:
-        feature: ["imxrt1010", "imxrt1020", "imxrt1040", "imxrt1050", "imxrt1060", "imxrt1064", "imxrt1160", "imxrt1170", "imxrt1180"]
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - run: rustup toolchain install stable --no-self-update --profile minimal
-    - name: Build (${{ matrix.feature }})
-      run: cargo build --package=imxrt-boot-gen --features=${{ matrix.feature }}
-    - name: Run tests (${{ matrix.feature }})
-      run: cargo test --package=imxrt-boot-gen --features=${{ matrix.feature }}
+    - run: rustup toolchain install stable --no-self-update --profile minimal --target thumbv7em-none-eabihf
+    - name: Build everything for the host
+      run: cargo build --workspace
+    - name: Run all tests on the host
+      run: cargo test --workspace
+    - name: Build everything for some embedded target
+      run: cargo build --workspace --target=thumbv7em-none-eabihf
   
   clippy:
-    strategy:
-      matrix:
-        feature: ["imxrt1010", "imxrt1020", "imxrt1040", "imxrt1050", "imxrt1060", "imxrt1160", "imxrt1170", "imxrt1180"]
-      
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-      - run: rustup toolchain install stable --no-self-update --profile minimal --component clippy
-      - run: cargo clippy --package=imxrt-boot-gen --features=${{ matrix.feature }} -- -D warnings
+      - run: rustup toolchain install stable --no-self-update --profile minimal --component clippy --target thumbv7em-none-eabihf
+      - run: cargo clippy --workspace --target=thumbv7em-none-eabihf -- -D warnings
 
   format:
     runs-on: ubuntu-latest
@@ -37,18 +31,3 @@ jobs:
       - run: rustup toolchain install stable --no-self-update --profile minimal --component rustfmt
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
-
-  fcbs:
-    strategy:
-      matrix:
-        fcb: ["imxrt1010evk-fcb", "imxrt1060evk-fcb", "imxrt1170evk-fcb", "imxrt1180evk-fcb", "vmu-rt1170-fcb"]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - run: rustup toolchain install stable --no-self-update --profile minimal --target thumbv7em-none-eabihf --component clippy
-    - name: Build for an embedded target
-      run: cargo build --package=${{ matrix.fcb }} --verbose --target=thumbv7em-none-eabihf
-    - name: Build and run tests on the host
-      run: cargo test --package=${{ matrix.fcb }} --verbose
-    - name: Lint the package
-      run: cargo clippy --package=${{ matrix.fcb }} --target=thumbv7em-none-eabihf -- -D warnings

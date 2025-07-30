@@ -59,6 +59,8 @@ mod fields;
 mod lookup;
 mod sequence;
 
+use core::num::NonZeroU8;
+
 pub use fields::*;
 pub use lookup::{Command, LookupTable};
 pub use sequence::{Instr, JUMP_ON_CS, Pads, STOP, Sequence, SequenceBuilder, opcodes};
@@ -114,7 +116,10 @@ pub const RECOMMENDED_CS_SETUP_TIME: u8 = 0x03;
 /// # Examples
 ///
 /// ```
-/// use imxrt_boot_gen::flexspi::*;
+/// use imxrt_boot_gen::{Imxrt, flexspi::*};
+///
+/// const CHIP: Imxrt = // ...
+/// # Imxrt::Imxrt1010;
 ///
 /// # const LUT: LookupTable = LookupTable::new();
 /// const FLEXSPI_CONFIGURATION_BLOCK: ConfigurationBlock =
@@ -127,7 +132,7 @@ pub const RECOMMENDED_CS_SETUP_TIME: u8 = 0x03;
 ///         .configuration_command(2, ConfigurationCommand::new(1, 12), 42)
 ///         .wait_time_cfg_commands(WaitTimeConfigurationCommands::new(40_000))
 ///         .flash_size(SerialFlashRegion::A1, 0x0020_0000)
-///         .serial_clk_freq(SerialClockFrequency::MHz60)
+///         .serial_clk_freq(CHIP.serial_clock_frequency(SerialClockOption::MHz60))
 ///         .serial_flash_pad_type(FlashPadType::Quad);
 ///
 #[derive(Debug, Clone, Copy)]
@@ -197,7 +202,7 @@ impl ConfigurationBlock {
             controller_misc_options: 0,
             device_type: 0, // Invalid value; must be updated in NOR / NAND configuration block
             serial_flash_pad_type: FlashPadType::Single,
-            serial_clk_freq: SerialClockFrequency::MHz30,
+            serial_clk_freq: SerialClockFrequency(NonZeroU8::new(1).unwrap()), // 30MHz on all parts
             lut_custom_seq_enable: 0,
             serial_flash_sizes: [0; 4],
             cs_pad_setting_override: 0,

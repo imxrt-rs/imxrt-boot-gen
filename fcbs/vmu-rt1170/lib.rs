@@ -6,8 +6,11 @@
 
 pub use nor::ConfigurationBlock;
 
+use imxrt_boot_gen::Imxrt;
 use imxrt_boot_gen::flexspi::{self, opcodes::sdr::*, *};
 use imxrt_boot_gen::serial_flash::*;
+
+const CHIP: Imxrt = Imxrt::Imxrt1170;
 
 const BOOT_SEQ_READ: Sequence = SequenceBuilder::new()
     .instr(Instr::new(CMD, Pads::One, 0x03))
@@ -26,7 +29,7 @@ const BOOT_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
         .cs_setup_time(1)
         .controller_misc_options(0x10)
         .serial_flash_pad_type(FlashPadType::Single)
-        .serial_clk_freq(SerialClockFrequency::MHz80)
+        .serial_clk_freq(CHIP.serial_clock_frequency(SerialClockOption::MHz80))
         .flash_size(SerialFlashRegion::A1, 64 * 1024 * 1024);
 
 /// Boot FlexSPI NOR Configuration for the VMU only needs read commands
@@ -34,12 +37,16 @@ const BOOT_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
 ///
 /// After booting the VMU can reconfigure FlexSPI to be clocked faster
 /// using OctalSPI as needed with the full LUT of command sequences.
-pub const BOOT_SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
-    nor::ConfigurationBlock::new(BOOT_CONFIGURATION_BLOCK)
+pub const BOOT_SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock = {
+    let mut cb = nor::ConfigurationBlock::new(CHIP, BOOT_CONFIGURATION_BLOCK)
         .page_size(256)
         .sector_size(4 * 1024)
-        .ip_cmd_serial_clk_freq(nor::SerialClockFrequency::MHz30)
-        .block_size(64 * 1024);
+        .ip_cmd_serial_clk_freq(Some(
+            CHIP.ip_serial_clock_frequency(SerialClockOption::MHz30),
+        ));
+    cb.extras(CHIP).unwrap().block_size(64 * 1024);
+    cb
+};
 
 #[unsafe(no_mangle)]
 #[cfg_attr(

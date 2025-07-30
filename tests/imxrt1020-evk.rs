@@ -1,7 +1,8 @@
-#![cfg(feature = "imxrt1020")]
-
+use imxrt_boot_gen::Imxrt;
 use imxrt_boot_gen::flexspi::{self, opcodes::sdr::*, *};
 use imxrt_boot_gen::serial_flash::*;
+
+const CHIP: Imxrt = Imxrt::Imxrt1020;
 
 /// Instructions for the ISSI IS25LP064A SPI flash memory controller
 mod issi {
@@ -41,7 +42,7 @@ const FLEXSPI_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
         .device_mode_configuration(DeviceModeConfiguration::Disabled)
         .wait_time_cfg_commands(WaitTimeConfigurationCommands::disable())
         .flash_size(SerialFlashRegion::A1, 0x0080_0000)
-        .serial_clk_freq(SerialClockFrequency::MHz100)
+        .serial_clk_freq(CHIP.serial_clock_frequency(SerialClockOption::MHz100))
         .serial_flash_pad_type(FlashPadType::Quad);
 
 //
@@ -51,10 +52,10 @@ const FLEXSPI_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
 //
 
 const SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
-    nor::ConfigurationBlock::new(FLEXSPI_CONFIGURATION_BLOCK)
+    nor::ConfigurationBlock::new(CHIP, FLEXSPI_CONFIGURATION_BLOCK)
         .page_size(256)
         .sector_size(4096)
-        .ip_cmd_serial_clk_freq(nor::SerialClockFrequency::NoChange);
+        .ip_cmd_serial_clk_freq(None);
 
 #[test]
 fn imxrt1020_evk() {
