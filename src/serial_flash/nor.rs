@@ -56,8 +56,8 @@ pub enum SerialClockFrequency {
 /// # use imxrt_boot_gen::flexspi::{self, LookupTable};
 ///
 /// # const FLEXSPI_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock = flexspi::ConfigurationBlock::new(LookupTable::new());
-/// #[no_mangle]
-/// #[link_section = ".serial_nor_cb"]
+/// #[unsafe(no_mangle)]
+/// #[unsafe(link_section = ".serial_nor_cb")]
 /// static SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
 ///     nor::ConfigurationBlock::new(FLEXSPI_CONFIGURATION_BLOCK)
 ///         .page_size(256)
@@ -167,7 +167,7 @@ const _STATIC_ASSERT_SIZE: [u32; 1] =
 
 #[cfg(test)]
 mod test {
-    use super::{flexspi, ConfigurationBlock, SerialClockFrequency};
+    use super::{ConfigurationBlock, SerialClockFrequency, flexspi};
     use crate::flexspi::LookupTable;
 
     #[test]

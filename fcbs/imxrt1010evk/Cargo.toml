@@ -1,7 +1,6 @@
 [package]
 name = "imxrt1010evk-fcb"
-version = "0.1.0"
-authors.workspace = true
+version = "0.2.0"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
@@ -10,7 +9,7 @@ keywords.workspace = true
 description = "FlexSPI configuration block for NXP's IMXRT1010EVK"
 
 [dependencies.imxrt-boot-gen]
-version = "0.3"
+version = "0.4.0"
 path = "../.."
 features = ["imxrt1010"]
 

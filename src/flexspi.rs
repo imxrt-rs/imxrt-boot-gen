@@ -61,7 +61,7 @@ mod sequence;
 
 pub use fields::*;
 pub use lookup::{Command, LookupTable};
-pub use sequence::{opcodes, Instr, Pads, Sequence, SequenceBuilder, JUMP_ON_CS, STOP};
+pub use sequence::{Instr, JUMP_ON_CS, Pads, STOP, Sequence, SequenceBuilder, opcodes};
 
 /// A version identifier.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

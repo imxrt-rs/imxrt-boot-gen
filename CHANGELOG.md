@@ -5,6 +5,8 @@ packages maintained within this repository.
 
 ## [Unreleased]
 
+**BREAKING** All packages use the Rust 2024 edition.
+
 ## [0.3.4] 2025-03-01
 
 Add support for new MCUS:
