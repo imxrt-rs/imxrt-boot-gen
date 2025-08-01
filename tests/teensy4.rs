@@ -1,9 +1,10 @@
 //! Serial NOR configuration block for the Teensy 4
 
-#![cfg(feature = "imxrt1060")]
-
+use imxrt_boot_gen::Imxrt;
 use imxrt_boot_gen::flexspi::{self, opcodes::sdr::*, *};
 use imxrt_boot_gen::serial_flash::*;
+
+const CHIP: Imxrt = Imxrt::Imxrt1060;
 
 /// Instructions for the Winbond W25Q16JV
 /// SPI flash memory controller
@@ -78,7 +79,7 @@ const FLEXSPI_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
         .device_mode_configuration(DeviceModeConfiguration::Disabled)
         .wait_time_cfg_commands(WaitTimeConfigurationCommands::disable())
         .flash_size(SerialFlashRegion::A1, 0x0020_0000)
-        .serial_clk_freq(SerialClockFrequency::MHz60)
+        .serial_clk_freq(CHIP.serial_clock_frequency(SerialClockOption::MHz60))
         .serial_flash_pad_type(FlashPadType::Quad);
 
 //
@@ -88,10 +89,12 @@ const FLEXSPI_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
 //
 
 const SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
-    nor::ConfigurationBlock::new(FLEXSPI_CONFIGURATION_BLOCK)
+    nor::ConfigurationBlock::new(CHIP, FLEXSPI_CONFIGURATION_BLOCK)
         .page_size(256)
         .sector_size(4096)
-        .ip_cmd_serial_clk_freq(nor::SerialClockFrequency::MHz30);
+        .ip_cmd_serial_clk_freq(Some(
+            CHIP.ip_serial_clock_frequency(SerialClockOption::MHz30),
+        ));
 
 #[test]
 fn teensy4() {

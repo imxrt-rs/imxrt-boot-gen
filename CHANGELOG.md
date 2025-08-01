@@ -7,6 +7,13 @@ packages maintained within this repository.
 
 **BREAKING** All packages use the Rust 2024 edition.
 
+**BREAKING** Remove all feature flags. The compile time API now relies
+on enums to describe chips. Invalid configurations produce a compile-time
+panic.
+
+If you were using this package with a 1064 MCU, then you may continue
+using the package as if it were a 1060 MCU variant.
+
 ## [0.3.4] 2025-03-01
 
 Add support for new MCUS:

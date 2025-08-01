@@ -6,8 +6,11 @@
 
 pub use nor::ConfigurationBlock;
 
+use imxrt_boot_gen::Imxrt;
 use imxrt_boot_gen::flexspi::{self, opcodes::sdr::*, *};
 use imxrt_boot_gen::serial_flash::*;
+
+const CHIP: Imxrt = Imxrt::Imxrt1010;
 
 const DENSITY_BITS: u32 = 128 * 1024 * 1024;
 const DENSITY_BYTES: u32 = DENSITY_BITS / 8;
@@ -55,14 +58,16 @@ const COMMON_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
         .device_mode_configuration(DeviceModeConfiguration::Disabled)
         .wait_time_cfg_commands(WaitTimeConfigurationCommands::disable())
         .flash_size(SerialFlashRegion::A1, DENSITY_BYTES)
-        .serial_clk_freq(SerialClockFrequency::MHz120)
+        .serial_clk_freq(CHIP.serial_clock_frequency(SerialClockOption::MHz120))
         .serial_flash_pad_type(FlashPadType::Quad);
 
 pub const SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
-    nor::ConfigurationBlock::new(COMMON_CONFIGURATION_BLOCK)
+    nor::ConfigurationBlock::new(CHIP, COMMON_CONFIGURATION_BLOCK)
         .page_size(256)
         .sector_size(4096)
-        .ip_cmd_serial_clk_freq(nor::SerialClockFrequency::MHz30);
+        .ip_cmd_serial_clk_freq(Some(
+            CHIP.ip_serial_clock_frequency(SerialClockOption::MHz30),
+        ));
 
 #[unsafe(no_mangle)]
 #[cfg_attr(

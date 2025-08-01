@@ -11,7 +11,6 @@ description = "FlexSPI configuration block for NXP's IMXRT1180EVK"
 [dependencies.imxrt-boot-gen]
 version = "0.4.0"
 path = "../.."
-features = ["imxrt1180"]
 
 [lib]
 path = "lib.rs"

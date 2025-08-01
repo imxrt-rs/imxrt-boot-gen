@@ -1,5 +1,7 @@
 //! FlexSPI configuration block fields
 
+use core::num::NonZeroU8;
+
 /// `readSampleClkSrc` of the general FCB   
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(u8)]
@@ -109,30 +111,35 @@ pub enum FlashPadType {
     Octal = 8,
 }
 
-/// `serialClkFreq`
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Options for the serial clock frequency.
+///
+/// Use this with an [`Imxrt`](crate::Imxrt) to produce
+/// a [`SerialClockFrequency`]. Note that not all options
+/// are valid for all parts.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]
-pub enum SerialClockFrequency {
-    MHz30 = 1,
+pub enum SerialClockOption {
+    MHz30,
     MHz50,
     MHz60,
-    #[cfg(not(any(feature = "imxrt1160", feature = "imxrt1170", feature = "imxrt1180")))]
     MHz75,
     MHz80,
     MHz100,
-    #[cfg(any(
-        feature = "imxrt1010",
-        feature = "imxrt1040",
-        feature = "imxrt1060",
-        feature = "imxrt1064",
-        feature = "imxrt1160",
-        feature = "imxrt1170",
-        feature = "imxrt1180"
-    ))]
     MHz120,
     MHz133,
-    #[cfg(not(feature = "imxrt1010"))]
     MHz166,
+}
+
+/// Serial clock frequency for flash read / write.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(transparent)]
+pub struct SerialClockFrequency(pub(crate) NonZeroU8);
+
+impl SerialClockFrequency {
+    /// Returns the raw value for this clock frequency enum.
+    pub const fn get(self) -> u8 {
+        self.0.get()
+    }
 }
 
 /// A FlexSPI serial flash region
