@@ -235,8 +235,8 @@ pub mod opcodes {
     /// See the documentation on the corresponding [`ssr` opcode](../sdr/index.html)
     /// for more information.
     pub mod ddr {
-        use super::sdr;
         use super::Opcode;
+        use super::sdr;
 
         /// Adds `0x20` to the opcode to make it a DDR opcode
         const fn to_ddr(opcode: Opcode) -> Opcode {
@@ -309,9 +309,9 @@ impl fmt::Debug for Opcode {
 
 #[cfg(test)]
 mod test {
-    use super::opcodes::sdr::*;
     use super::Instr;
     use super::Pads;
+    use super::opcodes::sdr::*;
     use super::{Sequence, SequenceBuilder};
 
     fn seq_to_bytes(seq: Sequence) -> Vec<u8> {

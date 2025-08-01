@@ -1,6 +1,6 @@
 //! FlexSPI Lookup table
 
-use super::sequence::{Sequence, SEQUENCE_SIZE};
+use super::sequence::{SEQUENCE_SIZE, Sequence};
 
 /// The default sequence definition lookup indices
 ///
