@@ -15,7 +15,7 @@ jobs:
       run: rustup toolchain install nightly --no-self-update --profile minimal --target thumbv7em-none-eabihf
 
     - name: Generate docs
-      run: cargo +nightly rustdoc --features imxrt1060 --target thumbv7em-none-eabihf -- --cfg docsrs
+      run: cargo +nightly rustdoc --target thumbv7em-none-eabihf -- --cfg docsrs
 
     - name: Write redirect
       run: echo "<meta http-equiv=\"refresh\" content=\"0;url=imxrt_boot_gen\">" > target/thumbv7em-none-eabihf/doc/index.html
