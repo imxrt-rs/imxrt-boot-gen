@@ -5,6 +5,8 @@ packages maintained within this repository.
 
 ## [Unreleased]
 
+## [0.4.0] 2025-09-23
+
 **BREAKING** All packages use the Rust 2024 edition.
 
 **BREAKING** Remove all feature flags. The compile time API now relies
@@ -177,7 +179,8 @@ static SERIAL_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
 
 First release
 
-[Unreleased]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.4...v0.4.0
 [0.3.4]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/imxrt-rs/imxrt-boot-gen/compare/v0.3.1...v0.3.2
