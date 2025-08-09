@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["SerialClockFrequency"],"struct":["ConfigurationBlock"]};
+window.SIDEBAR_ITEMS = {"struct":["ConfigurationBlock","Extras","IpSerialClockFrequency"]};

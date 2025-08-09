@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["flexspi","serial_flash"]};
+window.SIDEBAR_ITEMS = {"enum":["Error","Imxrt"],"mod":["flexspi","serial_flash"]};
