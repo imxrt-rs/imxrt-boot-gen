@@ -1,0 +1,16 @@
+[package]
+name = "imxrt1040evk-fcb"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+categories.workspace = true
+keywords.workspace = true
+description = "FlexSPI configuration block for NXP's IMXRT1040EVK"
+
+[dependencies.imxrt-boot-gen]
+version = "0.4.0"
+path = "../.."
+
+[lib]
+path = "lib.rs"
