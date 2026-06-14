@@ -16,7 +16,20 @@ The `imxrt-boot-gen` crate helps you generate data structures, like serial NOR F
 configuration blocks (FCB), that are required to boot i.MX RT processors. To understand
 all of its features and chip support, see the API documentation.
 
-### License
+## Extras
+
+To generate binary blobs for all FCBs known in this workspace, run
+
+```
+cargo run --package=fcbdump
+```
+
+You'll find the FCBs at `target/fcbdump/*.bin`. These can be conveniently
+installed into your board's external flash. By default, this tool assumes that
+you have a `rust-objcopy` available; you may change the tool by setting an
+`OBJCOPY` environment variable.
+
+## License
 
 Licensed under either of
 

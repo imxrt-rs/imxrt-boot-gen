@@ -33,4 +33,5 @@ default-target = "thumbv7em-none-eabihf"
 [workspace]
 members = [
     "fcbs/*",
+    "tools/*",
 ]
